@@ -1,0 +1,269 @@
+---
+title: "How to Use Sedentary Profiles"
+author: "Paul R. Hibbing"
+output: rmarkdown::pdf_document
+urlcolor: blue
+vignette: >
+  %\VignetteIndexEntry{PBpatterns}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+set.seed(610)
+Sys.setenv(`_R_S3_METHOD_REGISTRATION_NOTE_OVERWRITES_` = "false")
+```
+
+# Introduction
+
+The main purpose of this vignette is to show you how to use sedentary profiles. I have tried to write it as non-technically as possible, in recognition that most people are not R programmers, and many are not coders at all. That said, the profiles were created in R, and they need to be implemented in R. So I will not be able to avoid technical talk altogether. If you feel anything could be clearer, you are probably not alone. Please reach out on the Issues page (https://github.com/paulhibbing/PBpatterns/issues) and let me know what doesn't work or doesn't make sense. Others will thank you, and so will I!
+
+Before you proceed with the vignette, you will need to install the following free programs, if you haven't already:
+
+1. R (https://www.r-project.org/)
+   - This is the R programming language
+   
+2. RStudio (https://rstudio.com/products/rstudio/download/#download)
+   - This is technically optional, but **strongly** recommended. It is a program that enhances R by allowing you to work more interactively (type, point, click etc). It makes R into more of a "program" in the familiar sense.
+
+You can also set up a profile on GitHub (https://github.com/join). This is optional unless you want to communicate on the PBpatterns web page (https://github.com/paulhibbing/PBpatterns), e.g., by posting an Issue.
+
+**Note:** For this vignette, the focus is on the sedentary profiles of [Hibbing et al. (2021)](https://journals.lww.com/acsm-msse/Abstract/9000/Sedentary_Profiles__A_New_Perspective_on.95921.aspx). Eventually, new profiles may be created and additional support added to this package. The plan is for all such methods to be accessible via the same `PBpatterns::sb_profile` parent function, but time will tell how well that works.
+
+# Setting up the Code
+
+Once you have R, you need to get a copy of the PBpatterns code. You can do that in several ways, but I am going to focus on the easiest one. Simply open RStudio, paste the below code into your console, and press enter. If the code doesn't work, let me know. The most likely causes are 1) failure of dependencies to install, 2) problems with building this vignette, or 3) poor cross-platform coding. (The package was written using Windows 10 and may run into issues on other operating systems.)
+
+```{r install, eval=FALSE}
+
+if (!"remotes" %in% installed.packages()) install.packages("remotes")
+
+remotes::install_github("paulhibbing/PBpatterns")
+
+
+
+
+
+## If the above doesn't work, try the below.
+## One or both of these extra arguments might help
+
+remotes::install_github(
+  repo = "paulhibbing/PBpatterns",
+  dependencies = FALSE,
+  build_vignettes = FALSE
+)
+
+```
+
+# Using the Code
+
+To use the code, you need some accelerometer data. For now, let's start with the built in example data. Use this code to load it:
+
+```{r setup}
+
+data(example_data, package = "PBpatterns")
+
+## If you want a sense of how the data are structured,
+## un-comment and run the below. It will show you a few rows of data.
+ 
+# head(example_data)
+
+```
+
+Before we go further, you may want to familiarize yourself with a few relevant functions. Use the below code to look at the help pages. Don't worry if you find them unhelpful right now -- It's just good to know they are there. If you get stuck in the future, you can come back to them, and they may make more sense over time.
+
+```{r help, eval=FALSE}
+
+?PBpatterns::sb_bout_dist
+?PBpatterns::sb_profile
+?PBpatterns::sb_profile_Hibbing2021
+?PBpatterns::choi_wear
+
+```
+
+From here, let's see how we would determine the sedentary profile for the data we loaded earlier. It ends up being fairly easy. All we have to do is run the command below. Note that the program tells us it's calculating non-wear using the Choi algorithm. This will be done automatically unless you tell it you have already run a non-wear algorithm. To do that, just tell it where the information is stored by passing a value for the 'wear' argument. (See the commented line below. In this case, that line would throw an error because we have not created a variable called 'is_wear' -- We could have done so using the 'choi_wear' function. You'll see that function pop up in a couple of future snippets; it's very easy to use.)
+
+```{r bouts, cache=TRUE}
+
+PBpatterns::sb_profile(
+  object = example_data, ## Give it the data you want to evaluate
+  model = "both", ## Can be 'decisionTree', 'randomForest', or 'both'
+  id = NULL, ## This could name a stratifying variable, if applicable
+  counts = "PAXINTEN", ## Name the activity counts variable
+  #wear = "is_wear", ## Name the wear time variable (TRUE for wear time, else FALSE)
+  sb = 100, ## Provide the SB cut point
+  min_bout = 1, ## Minimum bout length. Must be 1 or 5
+  valid_indices = NULL ## Optional vector of indices that meet wear time criteria
+)
+
+```
+
+Let's change the settings to illustrate how else this could work.
+
+```{r bouts2, cache=TRUE}
+
+## Randomly sample 8000 row numbers to use as "valid indices". In a real
+## analysis, you might use this approach to specify which rows occurred on days
+## that have 10+ hours of wear time. (Notably, the `get_profile` function does
+## test for wear time internally, but it does not check for the extra criteria
+## like daily wear requirements -- that's up to you to take care of beforehand)
+
+valid_indices <- sample(
+  seq(nrow(example_data)), 8000
+)
+
+PBpatterns::sb_profile(
+  object = example_data,
+  model = "decisionTree",
+  id = "PAXDAY", ## Stratifying by day, just for illustration
+  counts = "PAXINTEN",
+  sb = 100,
+  min_bout = 5,
+  valid_indices = valid_indices
+)
+
+```
+
+So there you go! You now know how to determine the sedentary profile for one participant (or several, if you cleverly use the `id` argument). You can close this vignette if that's all you need. However, there are a few other topics you may find useful for supplementary analysis and work. That's what the rest of the vignette will cover.
+
+# Retrieving the bout distribution
+
+When we used the `get_profile` function, R took care of the whole profiling process for us under the hood. That means it pulled out the participant's bout distribution and analyzed it. If we want to see the distribution for ourselves, we can use the `sb_bout_dist` function in one of two ways:
+
+## 1) By directly providing information for one person
+
+```{r dist, cache=TRUE}
+
+
+PBpatterns::sb_bout_dist(
+  is_sb = example_data$PAXINTEN <= 100, ## SB cut point
+  is_wear = PBpatterns::choi_wear(example_data$PAXINTEN) ## Choi non-wear algorithm
+)
+
+```
+
+## 2) By providing data frame input and setting up a stratified analysis (much like we did for `get_profile`)
+
+```{r dist2, cache=TRUE}
+
+PBpatterns::sb_bout_dist(
+  df = example_data,
+  min_bout = 1,
+  id = "PAXDAY",
+  counts = "PAXINTEN",
+  sb = 100
+)
+
+```
+
+# After retrieving the bout distribution
+
+If we manually run `sb_bout_dist`, we can feed the output directly into `get_profile`. This allows us to look at both the bout distribution and the sedentary profile, although it does mean we have to do two steps instead of one. Using our example data, we could implement this two-step process like so:
+
+## Method 1 above
+
+```{r twostep1, cache=TRUE}
+
+bout_info <- PBpatterns::sb_bout_dist(
+  is_sb = example_data$PAXINTEN <= 100,
+  is_wear = PBpatterns::choi_wear(example_data$PAXINTEN)
+)
+
+profile <- PBpatterns::sb_profile(bout_info)
+## (We can get more sophisticated output if we add extra settings
+## like we did before, but this is fine for now)
+
+print(profile)
+
+```
+
+## Method 2 above
+
+```{r twostep2, cache=TRUE}
+
+bout_info <- PBpatterns::sb_bout_dist(
+  df = example_data,
+  min_bout = 1,
+  id = "PAXDAY",
+  counts = "PAXINTEN",
+  sb = 100,
+  simplify = FALSE ##<-- This is critical
+)
+
+profile <- PBpatterns::sb_profile(bout_info, model = "randomForest")
+
+print(profile)
+
+```
+
+# Managing your own accelerometer data
+
+Before wrapping up, let's address how you can get your own data into R, and how you can pre-process it so you can apply the PBpatterns code. That will ultimately depend on what type of monitor data you are using. I can't be exhaustive here, but I will give an example that will hopefully help. In the code below, I'll show how you might handle data from an ActiGraph data file. If you use a different monitor, the trick will be finding tools that allow you to use these same concepts on your specific data. In many cases, the tools are probably out there. If not, you might end up being the one to provide them by the time you're finished!
+
+```{r AG, cache=TRUE}
+
+## First, make sure you have the right packages installed
+
+  packages <- c("AGread", "PhysicalActivity", "magrittr")
+  invisible(lapply(
+    packages, function(x) if (!x %in% installed.packages()) install.packages(x)
+  ))
+  
+## Attach the magrittr package (makes code more readable via pipe operators like %>%)
+  
+  library(magrittr)
+  
+## Find an example data file
+  
+  ag_file <-
+    system.file("extdata/example1sec.csv", package = "AGread") %T>%
+    {stopifnot(file.exists(.))}
+  
+## Process the file using various packages, and
+## store the result in an object called AG
+  
+  AG <-
+    
+    ## Read and reintegrate
+    AGread::read_AG_counts(ag_file) %>%
+    AGread::reintegrate(60, direction = "forwards") %>%
+    
+    ## The next part is a hack I've needed in the past in order to get the
+    ## non-wear algorithm to work
+    within({
+      TimeStamp = as.character(Timestamp)
+    }) %>%
+    
+    ## Now run the algorithm
+    PhysicalActivity::wearingMarking(
+      perMinuteCts = 1, TS = "TimeStamp", cts = "Axis1",
+      newcolname = "is_wear", getMinuteMarking = TRUE
+    ) %>%
+  
+    ## Format the wear time variable to a logical vector
+    within({
+      is_wear = is_wear %in% "w" ## use %in% rather than == because of how it handles NA
+    }) %>%
+    
+    ## Get the sedentary profile
+    cbind(., PBpatterns::sb_profile(
+      ., counts = "Axis1", wear = "is_wear", model = "decisionTree"
+    )) %>%
+  
+    ## Take the `TimeStamp` variable back out
+    .[ ,names(.) != "TimeStamp"] %>%
+    
+    ## Rename the sedentary profile variable from 'decisionTree' to 'SB_profile'
+    stats::setNames(., gsub("^decisionTree$", "SB_profile", names(.)))
+    
+## View the data
+  
+  AG
+
+```
+
+That's it! Thanks for following along. Again, let me know on GitHub if there are improvements I can make.
