@@ -17,3 +17,12 @@ Imports:
 Remotes: 
     paulhibbing/PAutilities
 RoxygenNote: 7.1.1
+Depends: 
+    R (>= 2.10)
+Suggests: 
+    tree,
+    PhysicalActivity,
+    randomForest,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
