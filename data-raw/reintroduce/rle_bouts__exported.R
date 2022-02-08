@@ -126,7 +126,7 @@ sb_bout_summary <- function(
       c("SB_hr_day", "mean_SB_bout_min", "SB_perc"),
       "total_SB_min"
     ) %>%
-    cut_bouts(bouts) %>%
+    sb_range_bouts(bouts) %>%
     usual_bout_duration(bouts) %>%
     fragmentation_index(nrow(d), bouts) %>%
     gini(bouts) %>%

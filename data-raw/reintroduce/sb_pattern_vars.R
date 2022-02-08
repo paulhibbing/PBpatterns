@@ -18,7 +18,7 @@
 #'
 #' @keywords internal
 #' @name SB_bouts_internal
-cut_bouts <- function(d, bouts) {
+sb_range_bouts <- function(d, bouts) {
   data.frame(
     d,
     sb_0_14 = sum(ifelse(

@@ -33,51 +33,6 @@ validate_rle_bout_input <- function(d, is_activity, is_wear, time_var) {
 
 #' @rdname rle_bouts_internal
 #' @keywords internal
-rle_bouts <- function(
-  d, is_activity, is_wear,
-  epoch_length_sec, min_bout_minutes = 0,
-  valid_indices = 1:nrow(d)
-) {
-
-  paste(d[ ,is_activity], d[ ,is_wear]) %>%
-  PAutilities::index_runs(.) %>%
-  within({
-    values = as.character(values)
-    lengths = lengths * (epoch_length_sec / 60)
-  }) %>%
-  .[.$values == "TRUE TRUE", ] %>%
-  .[.$lengths >= min_bout_minutes, ] %>%
-  validate_rle_bouts(valid_indices)
-
-}
-
-#' @rdname rle_bouts_internal
-#' @keywords internal
-validate_rle_bouts <- function(bouts, valid_indices) {
-
-  if (nrow(bouts) > 0){
-
-    bouts %>%
-    purrr::pmap_lgl(
-      function(start_index, end_index, valid_indices, ...) {
-        seq(start_index, end_index) %>%
-        {. %in% valid_indices} %>%
-        all(.)
-      },
-      valid_indices
-    ) %>%
-    bouts[., ]
-
-  } else {
-
-   bouts
-
-  }
-
-}
-
-#' @rdname rle_bouts_internal
-#' @keywords internal
 other_info_weartime <- function(
   other_info, d, is_wear, time_var,
   valid_indices, epoch_length_sec
