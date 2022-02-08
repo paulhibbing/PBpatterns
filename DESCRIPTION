@@ -11,9 +11,11 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     DescTools,
+    ggplot2,
     magrittr,
     PAutilities,
-    purrr
+    purrr,
+    utils
 Remotes: 
     paulhibbing/PAutilities
 RoxygenNote: 7.1.1
@@ -24,5 +26,6 @@ Suggests:
     PhysicalActivity,
     randomForest,
     knitr,
-    rmarkdown
+    rmarkdown,
+    AGread
 VignetteBuilder: knitr

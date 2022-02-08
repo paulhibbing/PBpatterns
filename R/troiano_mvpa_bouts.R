@@ -1,9 +1,3 @@
-#' @param activation_window size of window (number of epochs) to use when
-#'   searching for a bout activation
-#' @param activation_min number of epochs in the activation window that must
-#'   equal \code{target} for an activation to be detected
-#' @param termination_min number of consecutive non-\code{target} epochs
-#'   required to terminate a bout
 #' @keywords internal
 #' @rdname analyze_bouts
 troiano_mvpa_bouts <- function(
@@ -27,26 +21,26 @@ troiano_mvpa_bouts <- function(
       x, target, activation_window, activation_min
     ),
     is_end = c(
-      tail(.$start_index, -1) - head(.$end_index, -1) - 1 >= 3,
+      utils::tail(.$start_index, -1) - utils::head(.$end_index, -1) - 1 >= 3,
       TRUE
     )
   ) %>%
-  troiano_bout_summarize(target) %>%
+  troiano_bout_summarize(x, target) %>%
   structure(
-    x = x, target = target, activation_window = activation_window,
+    x = x, target = target, input_length = length(x),
+    activation_window = activation_window,
     activation_min = activation_min, termination_min = termination_min,
     method = "Troiano_MVPA"
   )
 
-
-
 }
 
-troiano_bout_summarize <- function(runs, target) {
+troiano_bout_summarize <- function(runs, x, target) {
 
   if (!any(runs$is_start)) {
 
-    data.frame(start = NA_integer_, end = NA_integer_, mvpa_min = 0)
+    data.frame(start = NA_integer_, end = NA_integer_, mvpa_min = 0) %>%
+    structure(anyBouts = FALSE)
 
   } else {
 
@@ -77,7 +71,8 @@ troiano_bout_summarize <- function(runs, target) {
       },
       x,
       target
-    )
+    ) %>%
+    structure(anyBouts = TRUE)
 
   }
 
