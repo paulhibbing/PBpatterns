@@ -1,7 +1,8 @@
 ---
 title: "Clustered Recognition of Intermittent Bouts (CRIB)"
 author: "Paul R. Hibbing"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document
+urlcolor: blue
 vignette: >
   %\VignetteIndexEntry{CRIB}
   %\VignetteEngine{knitr::rmarkdown}
