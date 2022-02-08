@@ -5,9 +5,7 @@ crib_clusters <- function(
   longest_allowable_interruption, max_n_interruptions
 ) {
 
-  x %<>% dichotomize_intensity(target)
-
-  PAutilities::index_runs(x) %>%
+  twoclass_runs(x, target) %>%
   within({
     group = cumsum(values == "other" & lengths >= target_buffer)
   }) %>%
@@ -17,7 +15,7 @@ crib_clusters <- function(
   .[sapply(., function(df) nrow(df) > 0)] %>%
 
   purrr::map_df(
-    crib_stratum, x, target, required_percent,
+    crib_stratum, dichotomize_behavior(x, target), target, required_percent,
     longest_allowable_interruption, max_n_interruptions
   ) %>%
 

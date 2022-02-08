@@ -31,6 +31,12 @@ expand_bouts.default <- function(bouts, ...) {
     call. = FALSE
   )
 
+  if (attr(bouts, "method") %in% c("rle_standard", "SB_summary")) stop(
+    "No method exists yet for expanding bouts",
+    " from the `rle_standard` technique",
+    call. = FALSE
+  )
+
   if ("other" %in% bouts$values) warning(
     "`expand_bouts` may behave oddly when",
     " the input includes 'other' in its values",

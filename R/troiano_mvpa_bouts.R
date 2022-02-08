@@ -5,9 +5,7 @@ troiano_mvpa_bouts <- function(
   activation_min = 8, termination_min = 3
 ) {
 
-  dichotomize_intensity(x, target) %>%
-  PAutilities::index_runs(.) %>%
-  {.[.$values == target, ]} %>%
+  twoclass_runs(x, target, FALSE) %>%
   data.frame(
     .,
     is_start = sapply(
