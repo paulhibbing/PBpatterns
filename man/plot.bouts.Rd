@@ -25,8 +25,6 @@ intensity <- cut(
   c("SB", "LPA", "MVPA"),
   right = FALSE
 )
-\donttest{
-  bouts <- analyze_bouts(intensity, "MVPA", "CRIB", 30, 5, 50, 3)
-  plot(bouts)
-}
+bouts <- analyze_bouts(intensity, "MVPA", "Troiano_MVPA")
+# plot(bouts)
 }

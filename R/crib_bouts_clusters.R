@@ -5,10 +5,7 @@ crib_clusters <- function(
   longest_allowable_interruption, max_n_interruptions
 ) {
 
-  x %<>%
-    as.character(.) %>%
-    {. %in% target} %>%
-    ifelse(target, "other")
+  x %<>% dichotomize_intensity(target)
 
   PAutilities::index_runs(x) %>%
   within({
@@ -23,6 +20,7 @@ crib_clusters <- function(
     crib_stratum, x, target, required_percent,
     longest_allowable_interruption, max_n_interruptions
   ) %>%
+
   structure(., h = .$h) %>%
   within({
     h = NULL

@@ -14,14 +14,12 @@
 #'   c("SB", "LPA", "MVPA"),
 #'   right = FALSE
 #' )
-#' \donttest{
-#'   bouts <- analyze_bouts(intensity, "MVPA", "CRIB", 30, 5, 50, 3)
-#'   plot(bouts)
-#' }
+#' bouts <- analyze_bouts(intensity, "MVPA", "Troiano_MVPA")
+#' # plot(bouts)
 plot.bouts <- function(x, ...) {
 
   df <-
-    bout_expand(x) %>%
+    expand_bouts(x) %>%
     data.frame(x = seq(.), y = .)
 
   ggplot(df, aes(x, as.numeric(y))) +

@@ -70,7 +70,7 @@
 #'
 #' @seealso
 #'   \href{https://journals.lww.com/acsm-msse/pages/articleviewer.aspx?year=2008&issue=01000&article=00025&type=Fulltext}{Troiano et al. (2008)}
-#'   \code{\link{bout_expand}}
+#'   \code{\link{expand_bouts}}
 #'
 #' @examples
 #' data(example_data, package = "PBpatterns")

@@ -5,10 +5,9 @@ troiano_mvpa_bouts <- function(
   activation_min = 8, termination_min = 3
 ) {
 
-  as.character(x) %>%
-  {. %in% target} %>%
+  dichotomize_intensity(x, target) %>%
   PAutilities::index_runs(.) %>%
-  {.[.$values, ]} %>%
+  {.[.$values == target, ]} %>%
   data.frame(
     .,
     is_start = sapply(
@@ -39,7 +38,10 @@ troiano_bout_summarize <- function(runs, x, target) {
 
   if (!any(runs$is_start)) {
 
-    data.frame(start = NA_integer_, end = NA_integer_, mvpa_min = 0) %>%
+    data.frame(
+      start_index = NA_integer_, end_index = NA_integer_,
+      values = target, mvpa_min = 0
+    ) %>%
     structure(anyBouts = FALSE)
 
   } else {
@@ -51,20 +53,23 @@ troiano_bout_summarize <- function(runs, x, target) {
         .[1] %>%
         end[.] %>%
         {data.frame(
-          start = runs$start_index[start],
-          end = runs$end_index[.]
+          start_index = runs$start_index[start],
+          end_index = runs$end_index[.],
+          values = runs$values[start]
         )}
       },
       which(runs$is_end),
       runs
     ) %>%
-    split(., .$end) %>%
+    split(., .$end_index) %>%
     purrr::map_df(
       function(info, x, target) {
-        seq(info$start[1], info$end[nrow(info)]) %>%
+        seq(info$start_index[1], info$end_index[nrow(info)]) %>%
         x[.] %>%
         {data.frame(
-          start = info$start[1], end = info$end[nrow(info)],
+          start_index = info$start_index[1],
+          end_index = info$end_index[nrow(info)],
+          values = target,
           mvpa_min = sum(. %in% target)
         )} %>%
         {if (.$mvpa_min >= 10) . else NULL}

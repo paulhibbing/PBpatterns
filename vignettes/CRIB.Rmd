@@ -63,6 +63,8 @@ moderate-to-vigorous physical activity (MVPA). For illustration, let's say we
 initially coded our data as sedentary behavior ($PAXINTEN \leq 100$), light
 physical activity ($PAXINTEN\:\:101-759$), or MVPA ($PAXINTEN \geq 760$).
 
+\newpage
+
 ```{r prep, cache=TRUE}
 
 ## Determine minute-by-minute intensity
@@ -130,6 +132,8 @@ Here is what each piece means:
 * **minimum_bout_length = 10** Here we specify that only bouts lasting $\geq10$
   min should be included in the output.
   
+\newpage
+  
 The above elements are set up to allow flexible bout criteria depending on the
 research question and the variable of interest. In our example, we set
 `max_n_interruptions = Inf` to avoid a restriction in that area -- similar
@@ -174,14 +178,16 @@ This is a data frame with one row per bout. The variables are:
 As before, epoch length influences the interpretation of length variables. Keep
 that in mind.
 
+\newpage
+
 ## Expanding the Output
 
 In some cases we may want to convert our bout information back to the original
-length of the input (i.e., `intensity`). We can use the `bout_expand` function
+length of the input (i.e., `intensity`). We can use the `expand_bouts` function
 to accomplish that.
 
 ```{r expansion, cache=TRUE}
-expanded <- PBpatterns::bout_expand(mvpa_bouts)
+expanded <- PBpatterns::expand_bouts(mvpa_bouts)
 str(expanded)
 table(expanded)
 ```

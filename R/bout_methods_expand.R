@@ -14,36 +14,50 @@
 #'   c("SB", "LPA", "MVPA"),
 #'   right = FALSE
 #' )
-#' \donttest{
-#' bouts <- analyze_bouts(intensity, target = "MVPA", target_buffer = 1)
-#' tail(bout_expand(bouts), 40)
-#' }
-bout_expand <- function(bouts, ...) {
+#' bouts <- analyze_bouts(intensity, "MVPA", "Troiano_MVPA")
+#' expand_bouts(bouts)[910:940]
+expand_bouts <- function(bouts, ...) {
 
-  UseMethod("bout_expand", bouts)
+  UseMethod("expand_bouts", bouts)
 
 }
 
-#' @rdname bout_expand
+#' @rdname expand_bouts
 #' @export
-bout_expand.default <- function(bouts, ...) {
+expand_bouts.default <- function(bouts, ...) {
+
+  if (!is.data.frame(bouts)) stop(
+    "Don\'t know how to handle data frames in `expand_bouts`",
+    call. = FALSE
+  )
 
   if ("other" %in% bouts$values) warning(
-    "`bout_expand` may behave oddly when",
-    " the input includes 'other' in its values"
+    "`expand_bouts` may behave oddly when",
+    " the input includes 'other' in its values",
+    call. = FALSE
   )
 
   target <-
     attr(bouts, "target") %T>%
-    {stopifnot(all(bouts$values == .))}
+    {if (!all(bouts$values == .)) stop(
+      "Expecting all(bouts$values == attr(bouts, \"target\")) == TRUE",
+      call. = FALSE
+    )}
 
-  anyBouts <- attr(bouts, "anyBouts")
+  anyBouts <-
+    attr(bouts, "anyBouts") %T>%
+    {if ((!is.logical(.)) | is.na(.)) stop(
+      "attr(bouts, \"anyBouts\") is not logical and non-missing",
+      call. = FALSE
+    )}
 
   result <-
     attr(bouts, "input_length") %>%
     rep("other", .)
 
-  if (!anyBouts) return(result)
+  if (!anyBouts) return(
+    factor(result, c("other", target, "interruption"))
+  )
 
   for (i in seq(nrow(bouts))) {
 
