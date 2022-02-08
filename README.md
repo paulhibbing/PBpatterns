@@ -31,12 +31,16 @@ library(PBpatterns)
 
 ## Set up data
 
-  data(ex_data, package = "PAutilities")
+  data(example_data, package = "PBpatterns")
 
-  ex_data$is_sb <- ex_data$Axis1 <= 100
-  ex_data$is_mvpa <- ex_data$Axis1 >= 1952
-  ex_data$Timestamp <- as.POSIXct(ex_data$DateTime, "UTC")
-  
+  example_data$is_sb <- example_data$PAXINTEN <= 100
+  example_data$is_mvpa <- example_data$PAXINTEN >= 760
+  example_data$Timestamp <- seq(
+    as.POSIXct("00:00:00", "UTC", format = "%H:%M:%S"),
+    by = "1 min",
+    length.out = nrow(example_data)
+  )
+
   valid_indices <- c(
     654:1454, 1917:2837, 3499:4266, 5216:5632,
     6340:7119, 7704:8555, 9118:10077
@@ -45,11 +49,11 @@ library(PBpatterns)
 ## Analyze bouts
 
   sb_bouts <- sb_bout_summary(
-    ex_data, valid_indices = valid_indices
+    example_data, valid_indices = valid_indices
   )
   
   with_mvpa <- mvpa_bout_summary(
-    ex_data, valid_indices = valid_indices, other_info = sb_bouts
+    example_data, valid_indices = valid_indices, other_info = sb_bouts
   )
 
   adjusted_output <- bout_summary_residual_adjust(with_mvpa)
