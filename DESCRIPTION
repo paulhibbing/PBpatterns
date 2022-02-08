@@ -15,6 +15,7 @@ Imports:
     magrittr,
     PAutilities,
     purrr,
+    stats,
     utils
 Remotes: 
     paulhibbing/PAutilities

@@ -1,35 +1,21 @@
-#' @name Hibbing_2021_internal
-#' @title Functions used internally in the package
-#'
-#' @inheritParams sb_profile
-#' @inheritParams sb_bout_dist
-#' @param result output that may need data frame formatting (possibly ID-based)
-#'
-#' @details The purpose of \code{id_wear_time_verify} is to determine if the Choi
-#'   wear time algorithm needs to be run and, if so, to run it (via
-#'   \code{\link{choi_wear}}, with a message). To bypass,
-#'   run \code{df$is_wear <- TRUE} prior to executing
-#'   \code{id_wear_time_verify(df, id, wear = "is_wear")}.
-#'
-#'   \code{df_check_format} is a wrapper that encompasses
-#'
-#' @keywords internal
-NULL
+# profile_df_check (main) -------------------------------------------------
 
 #' @rdname Hibbing_2021_internal
 #' @keywords internal
-df_check_format <- function(df, counts, valid_indices, id, wear) {
+profile_df_check <- function(df, counts, valid_indices, id, wear) {
 
   df %>%
-  counts_verify(counts) %>%
-  valid_indices_verify(valid_indices) %>%
-  id_wear_time_verify(id, wear)
+  profile_counts_check(counts) %>%
+  profile_indices_check(valid_indices) %>%
+  profile_id_wear_check(id, wear)
 
 }
 
+# profile_df_check (primary helpers) --------------------------------------
+
 #' @rdname Hibbing_2021_internal
 #' @keywords internal
-counts_verify <- function(df, counts) {
+profile_counts_check <- function(df, counts) {
 
   if (is.null(counts) | missing(counts)) stop(
     "To run this operation on a data frame, you must pass a value for",
@@ -37,7 +23,7 @@ counts_verify <- function(df, counts) {
     "\ncolumn on which to operate)", call. = FALSE
   )
 
-  if (!counts %in% names(df)) {
+  if (!exists(counts, df)) {
 
     stop(
       "`counts` must be a column name in `df`",
@@ -58,7 +44,7 @@ counts_verify <- function(df, counts) {
 
 #' @rdname Hibbing_2021_internal
 #' @keywords internal
-valid_indices_verify <- function(df, valid_indices) {
+profile_indices_check <- function(df, valid_indices) {
 
   df %>%
   {within(., {
@@ -73,14 +59,14 @@ valid_indices_verify <- function(df, valid_indices) {
 
 #' @rdname Hibbing_2021_internal
 #' @keywords internal
-id_wear_time_verify <- function(df, id, wear) {
+profile_id_wear_check <- function(df, id, wear) {
 
-  if (is.null(wear) & "is_wear" %in% names(df)) {
+  if (is.null(wear) & exists("is_wear", df)) {
     stop(
       "Detected a column called `is_wear` with no value passed for ",
       "the `wear` argument.\nThis is not allowed. To fix, either rename ",
       "the current `is_wear` variable\nor rerun the ",
-      "call adding this: wear = \"non-wear\"",
+      "call adding this: wear = \"is_wear\"",
       call. = FALSE
     )
   }
@@ -90,14 +76,14 @@ id_wear_time_verify <- function(df, id, wear) {
 
   if (!is.null(wear)) {
 
-    stopifnot(wear %in% names(df))
+    stopifnot(exists(wear, df))
     location_of_wear_variable <- which(names(df) == wear)
     stopifnot(length(location_of_wear_variable) == 1)
     names(df)[location_of_wear_variable] <- "is_wear"
 
   }
 
-  df %<>% id_verify(id)
+  df %<>% profile_id_verify(id)
 
   if (is.null(wear)) {
 
@@ -108,7 +94,7 @@ id_wear_time_verify <- function(df, id, wear) {
 
     df %<>%
       lapply("[[", "counts") %>%
-      lapply(choi_wear) %>%
+      lapply(profile_choi_wear) %>%
       {mapply(data.frame, df, is_wear = ., SIMPLIFY = FALSE)}
 
   }
@@ -117,16 +103,18 @@ id_wear_time_verify <- function(df, id, wear) {
 
 }
 
+# profile_df_check (secondary helpers) -----------------------------------
+
 #' @rdname Hibbing_2021_internal
 #' @keywords internal
-id_verify <- function(df, id) {
+profile_id_verify <- function(df, id) {
 
   if (!is.null(id)) {
 
     if (!all(
       is.character(id),
       length(id) == 1,
-      id %in% names(df)
+      exists(id, df)
     )) {
       stop(
         "id must be a character scalar corresponding",
@@ -153,36 +141,27 @@ id_verify <- function(df, id) {
 
 #' @rdname Hibbing_2021_internal
 #' @keywords internal
-id_bind <- function(result, id, simplify = TRUE) {
+profile_choi_wear <- function(counts) {
 
-  ## Step 1 (Stops here if no formatting desired, i.e., simplify = FALSE)
+  if (!requireNamespace("PhysicalActivity", quietly = TRUE)) {
+    stop("Run `install.packages(\"PhysicalActivity\") and try again")
+  }
 
-    if (!simplify) {
+  invisible(utils::capture.output(
 
-      return(result)
-
-    } else {
-
-      result %<>% do.call(rbind, .)
-
-    }
-
-  ## Step 2
-
-    if (!is.null(id)) {
-
-      data.frame(
-        variable = row.names(result),
-        result,
-        stringsAsFactors = FALSE,
-        row.names = NULL
+    result <-
+      as.POSIXct("2000-01-01", "UTC") %>%
+      seq(by = "1 min", length.out = length(counts)) %>%
+      as.character(.) %>%
+      data.frame(TimeStamp = ., counts = counts) %>%
+      PhysicalActivity::wearingMarking(
+        perMinuteCts = 1, cts = "counts",
+        getMinuteMarking = TRUE
       ) %>%
-      stats::setNames(., gsub("^variable$", id, names(.)))
+      {.$wearing %in% "w"}
 
-    } else {
+  ))
 
-      result
-
-    }
+  result
 
 }
