@@ -3,6 +3,7 @@
 S3method(sb_profile_Hibbing2021,bout)
 S3method(sb_profile_Hibbing2021,data.frame)
 S3method(sb_profile_Hibbing2021,list)
+export(analyze_bouts)
 export(bout_summary_residual_adjust)
 export(choi_wear)
 export(mvpa_bout_summary)
