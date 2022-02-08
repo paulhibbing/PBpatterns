@@ -55,19 +55,20 @@ check_no_bouts(results, x, target)
 
 \item{target}{the level of \code{x} for which to examine bouts}
 
-\item{target_buffer}{numeric (CRIB). Maximum separation between runs of
-\code{target}, beyond which they will not be clustered together}
+\item{target_buffer}{numeric (\code{CRIB}). Maximum separation between runs
+of \code{target}, beyond which they will not be clustered together}
 
-\item{required_percent}{numeric (1-100; CRIB). The minimum percentage of the
-full bout period that must be spent engaging in the target behavior. Stated
-differently, this threshold stipulates that interruptions can compose no
-more than \code{100-required_percent} of the bout}
+\item{required_percent}{numeric (1-100; \code{CRIB}). The minimum percentage
+of the full bout period that must be spent engaging in the target behavior.
+Stated differently, this threshold stipulates that interruptions can
+compose no more than \code{100-required_percent} of the bout}
 
-\item{longest_allowable_interruption}{numeric (CRIB). The maximum length for
-any single interruption in a valid bout}
+\item{longest_allowable_interruption}{numeric (\code{CRIB}). The maximum
+length for any single interruption in a valid bout}
 
-\item{max_n_interruptions}{numeric (CRIB). The maximum number of interruption
-events that are allowed before a bout will be considered invalid}
+\item{max_n_interruptions}{numeric (\code{CRIB}). The maximum number of
+interruption events that are allowed before a bout will be considered
+invalid}
 
 \item{runs}{pre-processed input (mostly run length encoded)}
 

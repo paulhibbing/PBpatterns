@@ -2,25 +2,25 @@
 % Please edit documentation in R/sb_profile.R
 \name{sb_profile}
 \alias{sb_profile}
-\title{Implement the sedentary profiles}
+\title{Implement sedentary profiles}
 \usage{
 sb_profile(object, method = "Hibbing_2021", ...)
 }
 \arguments{
 \item{object}{input (either data frame or output from
-\code{\link{sb_bout_dist}})}
+\code{\link{profile_describe_sb}})}
 
 \item{method}{character. The profile method to use (currently only supports
-\code{Hibbing_2021}).}
+\code{"Hibbing_2021"}).}
 
-\item{...}{further arguments passed to \code{\link{sb_bout_dist}} (used only
-in data frame method)}
+\item{...}{further arguments passed to \code{\link{profile_describe_sb}}
+(used only in data frame method)}
 }
 \value{
 one or more profile assignments
 }
 \description{
-Implement the sedentary profiles
+Implement sedentary profiles
 }
 \examples{
 data(example_data, package = "PBpatterns")
