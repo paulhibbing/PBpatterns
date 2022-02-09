@@ -10,9 +10,9 @@
 \alias{alpha}
 \title{Internal functions providing information about sedentary bout patterns}
 \usage{
-sb_patterns(d, bouts, x, epoch_length_sec)
+sb_patterns(d, bouts, x)
 
-sb_range_bouts(d, bouts, epoch_length_sec)
+sb_range_bouts(d, bouts)
 
 usual_bout_duration(d, bouts)
 
