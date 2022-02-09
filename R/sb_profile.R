@@ -12,14 +12,18 @@
 #'
 #' @examples
 #' data(example_data, package = "PBpatterns")
-#' sb_profile(example_data, counts = "PAXINTEN")
+#' sb_profile(example_data, counts = "PAXINTEN", epoch_length_sec = 60)
 #' sb_profile(
-#'   example_data, counts = "PAXINTEN", model = "randomForest"
+#'   example_data, counts = "PAXINTEN",
+#'   model = "randomForest", epoch_length_sec = 60
 #' )
-#' sb_profile(example_data, id = "PAXDAY", counts = "PAXINTEN")
 #' sb_profile(
 #'   example_data, id = "PAXDAY",
-#'   counts = "PAXINTEN", model = "decisionTree"
+#'   counts = "PAXINTEN", epoch_length_sec = 60
+#' )
+#' sb_profile(
+#'   example_data, id = "PAXDAY", counts = "PAXINTEN",
+#'   model = "decisionTree", epoch_length_sec = 60
 #' )
 #'
 #' @seealso

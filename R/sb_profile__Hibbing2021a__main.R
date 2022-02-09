@@ -2,6 +2,19 @@
 #'
 #' @inheritParams sb_profile
 #' @param model character. The model(s) to use for the prediction
+#' @param id character scalar (optional). Column name on which to divide
+#'   \code{object} (if a data frame) into a list of separate objects
+#' @param counts character scalar. Column name of the variable to use when
+#'   classifying sedentary behavior (and wear time, depending on the function)
+#' @param wear character scalar [optional]. Column name of the variable to use
+#'   for determining wear time (logical vector with \code{TRUE} for wear time
+#'   minutes). If no value is provided, \code{\link{profile_choi_wear}} is invoked on
+#'   the \code{counts} column
+#' @param sb numeric. The cut point to use for classifying sedentary behavior
+#' @param valid_indices [optional] numeric/integer/logical vector specifying
+#'   which indices of \code{is_sb} and {is_wear} correspond to valid measurement
+#'   days (e.g. with 10+ hours of wear time on 4+ days). The default
+#'   (\code{NULL}) assumes all elements are valid
 #' @seealso
 #'   \href{https://journals.lww.com/acsm-msse/Abstract/9000/Sedentary_Profiles__A_New_Perspective_on.95921.aspx}{Hibbing et al. (2021)}
 sb_profile_Hibbing2021 <- function(object, method = "Hibbing_2021", ...) {
@@ -84,18 +97,6 @@ sb_profile_Hibbing2021.bouts <- function(
 }
 
 #' @rdname sb_profile_Hibbing2021
-#' @param id character scalar (optional). Column name on which to divide
-#'   \code{object} (if a data frame) into a list of separate objects
-#' @param counts character scalar. Column name of the variable to use when
-#'   classifying sedentary behavior (and wear time, depending on the function)
-#' @param wear character scalar [optional]. Column name of the variable to use
-#'   for determining wear time (logical vector with \code{TRUE} for wear time
-#'   minutes). If no value is provided, \code{\link{profile_choi_wear}} is invoked on
-#'   the \code{counts} column
-#' @param sb integer. The cut point to use for classifying sedentary behavior
-#' @param valid_indices integer vector (optional) specifying which indices of
-#'   \code{is_sb} and {is_wear} correspond to valid measurement days (e.g. with
-#'   10+ hours of wear time on 4+ days)
 #' @export
 sb_profile_Hibbing2021.data.frame <- function(
   object, method = "Hibbing_2021", model = c("both", "decisionTree", "randomForest"),
@@ -111,7 +112,7 @@ sb_profile_Hibbing2021.data.frame <- function(
       df = NULL,
       is_sb = x$counts <= sb,
       is_wear = x$is_wear,
-      valid_indices = which(x$valid_index),
+      valid_indices = x$valid_index,
       ...
     )},
     sb, ...

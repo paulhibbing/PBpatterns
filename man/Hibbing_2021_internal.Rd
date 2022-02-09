@@ -31,9 +31,10 @@ profile_id_bind(result, id, simplify = TRUE)
 \item{counts}{character scalar. Column name of the variable to use when
 classifying sedentary behavior (and wear time, depending on the function)}
 
-\item{valid_indices}{integer vector (optional) specifying which indices of
-\code{is_sb} and {is_wear} correspond to valid measurement days (e.g. with
-10+ hours of wear time on 4+ days)}
+\item{valid_indices}{[optional] numeric/integer/logical vector specifying
+which indices of \code{is_sb} and {is_wear} correspond to valid measurement
+days (e.g. with 10+ hours of wear time on 4+ days). The default
+(\code{NULL}) assumes all elements are valid}
 
 \item{id}{character scalar (optional). Column name on which to divide
 \code{object} (if a data frame) into a list of separate objects}

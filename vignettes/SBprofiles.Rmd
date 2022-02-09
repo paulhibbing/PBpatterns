@@ -134,6 +134,7 @@ PBpatterns::sb_profile(
   #wear = "is_wear", ## Name the wear time variable (TRUE for wear time, else FALSE)
   sb = 100, ## Provide the SB cut point
   minimum_bout_length = 1, ## Minimum bout length. Must be 1 or 5
+  epoch_length_sec = 60, ## Tell it the epoch length of your data
   valid_indices = NULL ## Optional vector of indices that meet wear time criteria
 )
 
@@ -149,6 +150,8 @@ Let's change the settings to illustrate how else this could work.
 ## test for wear time internally, but it does not check for the extra criteria
 ## like daily wear requirements -- that's up to you to take care of beforehand)
 
+set.seed(610)
+
 valid_indices <- sample(
   seq(nrow(example_data)), 8000
 )
@@ -160,6 +163,7 @@ PBpatterns::sb_profile(
   counts = "PAXINTEN",
   sb = 100,
   minimum_bout_length = 5,
+  epoch_length_sec = 60,
   valid_indices = valid_indices
 )
 
@@ -185,7 +189,8 @@ we can use the `profile_describe_sb` function in one of two ways:
 
 PBpatterns::profile_describe_sb(
   is_sb = example_data$PAXINTEN <= 100, ## SB cut point
-  is_wear = rep(TRUE, nrow(example_data)) ## Assume all epochs are wear time
+  is_wear = TRUE, ## Assume all epochs are wear time
+  epoch_length_sec = 60
 )
 
 ```
@@ -202,7 +207,8 @@ PBpatterns::profile_describe_sb(
   id = "PAXDAY",
   wear = "is_wear",
   counts = "PAXINTEN",
-  sb = 100
+  sb = 100,
+  epoch_length_sec = 60
 )
 
 ```
@@ -220,7 +226,8 @@ Using our example data, we could implement this two-step process like so:
 
 bout_info <- PBpatterns::profile_describe_sb(
   is_sb = example_data$PAXINTEN <= 100,
-  is_wear = example_data$is_wear
+  is_wear = example_data$is_wear,
+  epoch_length_sec = 60
 )
 
 profile <- PBpatterns::sb_profile(bout_info)
@@ -242,6 +249,7 @@ bout_info <- PBpatterns::profile_describe_sb(
   wear = "is_wear",
   counts = "PAXINTEN",
   sb = 100,
+  epoch_length_sec = 60,
   simplify = FALSE ##<-- This is critical
 )
 
@@ -310,7 +318,8 @@ the time you're finished!
     
     ## Get the sedentary profile
     cbind(., PBpatterns::sb_profile(
-      ., counts = "Axis1", wear = "is_wear", model = "decisionTree"
+      ., counts = "Axis1", wear = "is_wear",
+      model = "decisionTree", epoch_length_sec = 60
     )) %>%
   
     ## Take the `TimeStamp` variable back out

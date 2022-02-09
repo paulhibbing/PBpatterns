@@ -16,7 +16,8 @@ profile_describe_sb(
   wear = NULL,
   sb = 100,
   simplify = TRUE,
-  probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9)
+  probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
+  epoch_length_sec
 )
 
 profile_describe_sb_df(
@@ -28,7 +29,8 @@ profile_describe_sb_df(
   minimum_bout_length = 5,
   valid_indices = NULL,
   simplify = TRUE,
-  probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9)
+  probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
+  epoch_length_sec
 )
 }
 \arguments{
@@ -43,9 +45,10 @@ wear time (\code{TRUE}) or non-wear  (\code{FALSE})}
 
 \item{minimum_bout_length}{numeric. Minimum number of epochs in a valid bout}
 
-\item{valid_indices}{integer vector (optional) specifying which indices of
-\code{is_sb} and {is_wear} correspond to valid measurement days (e.g. with
-10+ hours of wear time on 4+ days)}
+\item{valid_indices}{[optional] numeric/integer/logical vector specifying
+which indices of \code{is_sb} and {is_wear} correspond to valid measurement
+days (e.g. with 10+ hours of wear time on 4+ days). The default
+(\code{NULL}) assumes all elements are valid}
 
 \item{id}{character scalar (optional). Column name on which to divide
 \code{object} (if a data frame) into a list of separate objects}
@@ -58,12 +61,14 @@ for determining wear time (logical vector with \code{TRUE} for wear time
 minutes). If no value is provided, \code{\link{profile_choi_wear}} is invoked on
 the \code{counts} column}
 
-\item{sb}{integer. The cut point to use for classifying sedentary behavior}
+\item{sb}{numeric. The cut point to use for classifying sedentary behavior}
 
 \item{simplify}{logical. Collapse output for each stratum into a single data
 frame?}
 
 \item{probs}{numeric vector. Quantiles to summarize in the output}
+
+\item{epoch_length_sec}{numeric. The epoch_length of \code{x}}
 }
 \description{
 Extract a summary of bout duration distribution for sedentary profiles
@@ -78,7 +83,8 @@ data(example_data, package = "PBpatterns")
 example_data$is_wear <- TRUE
 profile_describe_sb(
   example_data, counts = "PAXINTEN",
-  wear = "is_wear", id = "PAXDAY"
+  wear = "is_wear", id = "PAXDAY",
+  epoch_length_sec = 60
 )
 }
 \keyword{internal}

@@ -58,11 +58,12 @@ for determining wear time (logical vector with \code{TRUE} for wear time
 minutes). If no value is provided, \code{\link{profile_choi_wear}} is invoked on
 the \code{counts} column}
 
-\item{sb}{integer. The cut point to use for classifying sedentary behavior}
+\item{sb}{numeric. The cut point to use for classifying sedentary behavior}
 
-\item{valid_indices}{integer vector (optional) specifying which indices of
-\code{is_sb} and {is_wear} correspond to valid measurement days (e.g. with
-10+ hours of wear time on 4+ days)}
+\item{valid_indices}{[optional] numeric/integer/logical vector specifying
+which indices of \code{is_sb} and {is_wear} correspond to valid measurement
+days (e.g. with 10+ hours of wear time on 4+ days). The default
+(\code{NULL}) assumes all elements are valid}
 }
 \description{
 Apply the SB profiles of Hibbing et al. (2021)

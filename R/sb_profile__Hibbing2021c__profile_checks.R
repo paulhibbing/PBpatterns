@@ -46,14 +46,9 @@ profile_counts_check <- function(df, counts) {
 #' @keywords internal
 profile_indices_check <- function(df, valid_indices) {
 
-  df %>%
-  {within(., {
-    valid_index = if (is.null(valid_indices)) {
-      TRUE
-    } else {
-      seq(nrow(.)) %in% valid_indices
-    }
-  })}
+  valid_indices %>%
+  valid_valid_indices(df, TRUE) %>%
+  {within( df, {valid_index = .} )}
 
 }
 
