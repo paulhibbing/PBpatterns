@@ -38,9 +38,10 @@ sb_summary_bouts(
   x,
   target,
   is_wear,
-  minimum_bout_length = 5,
+  minimum_bout_length = 0,
   valid_indices = NULL,
-  probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9)
+  probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
+  patterns = TRUE
 )
 
 troiano_mvpa_bouts(
@@ -140,6 +141,7 @@ Users should note that these functions (input, code, and output)
 }
 \examples{
 data(example_data, package = "PBpatterns")
+
 x <- cut(
   example_data$PAXINTEN,
   c(-Inf, 101, 760, Inf),
@@ -147,9 +149,13 @@ x <- cut(
   right = FALSE
 )
 
+analyze_bouts(x, "MVPA", "rle_standard")[1:6, ]
+\donttest{
+analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10)
+}
 analyze_bouts(x, "MVPA", "Troiano_MVPA")
 \donttest{
-  analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10)
+analyze_bouts(x, "SB", "SB_summary", is_wear = TRUE)
 }
 
 }

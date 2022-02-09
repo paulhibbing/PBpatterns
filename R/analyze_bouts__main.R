@@ -76,6 +76,7 @@
 #'
 #' @examples
 #' data(example_data, package = "PBpatterns")
+#'
 #' x <- cut(
 #'   example_data$PAXINTEN,
 #'   c(-Inf, 101, 760, Inf),
@@ -83,9 +84,13 @@
 #'   right = FALSE
 #' )
 #'
+#' analyze_bouts(x, "MVPA", "rle_standard")[1:6, ]
+#' \donttest{
+#' analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10)
+#' }
 #' analyze_bouts(x, "MVPA", "Troiano_MVPA")
 #' \donttest{
-#'   analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10)
+#' analyze_bouts(x, "SB", "SB_summary", is_wear = TRUE)
 #' }
 #'
 #' @export
