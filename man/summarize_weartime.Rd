@@ -4,7 +4,13 @@
 \alias{summarize_weartime}
 \title{Generate a summary of accelerometer wear time}
 \usage{
-summarize_weartime(d, is_wear, time_var, valid_indices, other_info = NULL)
+summarize_weartime(
+  d,
+  is_wear,
+  time_var,
+  valid_indices = NULL,
+  other_info = NULL
+)
 }
 \arguments{
 \item{d}{data frame of accelerometer data}
@@ -45,7 +51,7 @@ example_data$intensity <- cut(
 
 extra_info <- analyze_bouts(
   example_data$intensity, "SB", "SB_summary",
-  is_wear = example_data$is_wear
+  is_wear = example_data$is_wear, epoch_length_sec = 60
 )
 
 ## Standalone usage

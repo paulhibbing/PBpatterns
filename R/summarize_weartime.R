@@ -32,7 +32,7 @@
 #'
 #' extra_info <- analyze_bouts(
 #'   example_data$intensity, "SB", "SB_summary",
-#'   is_wear = example_data$is_wear
+#'   is_wear = example_data$is_wear, epoch_length_sec = 60
 #' )
 #'
 #' ## Standalone usage
@@ -44,24 +44,18 @@
 #'   other_info = extra_info
 #' )
 summarize_weartime <- function(
-  d, is_wear, time_var, valid_indices, other_info = NULL
+  d, is_wear, time_var, valid_indices = NULL, other_info = NULL
 ) {
 
   ## Initial tests
 
     stopifnot(
-      is.data.frame(d),
+      is.data.frame(d), !any(duplicated(names(d))),
       exists(is_wear, d), is.logical(d[ ,is_wear]),
       exists(time_var, d), inherits(d[ ,time_var], "POSIXt")
     )
 
-    if (missing(valid_indices)) {
-      valid_indices <- rep(TRUE, nrow(d))
-    } else {
-      stopifnot(
-        inherits(valid_indices, c("integer", "numeric", "logical"))
-      )
-    }
+    valid_indices %<>% valid_valid_indices(d)
 
   ## Epoch length
 
@@ -85,7 +79,7 @@ summarize_weartime <- function(
     if (is.null(other_info)) {
 
       other_info <- data.frame(
-        epoch_length_sec = epoch_length_sec,
+        epoch_length = epoch_length_sec,
         total_weartime_min = total_weartime_min
       )
 
@@ -93,9 +87,9 @@ summarize_weartime <- function(
 
       stopifnot(is.data.frame(other_info), nrow(other_info) == 1)
 
-      if (!exists("epoch_length_sec", other_info)) {
+      if (!exists("epoch_length", other_info)) {
         other_info %<>% data.frame(
-          epoch_length_sec = epoch_length_sec, .
+          epoch_length = epoch_length_sec, .
         )
       }
 
@@ -127,7 +121,7 @@ summarize_weartime <- function(
 
   ## Finish up
 
-    c("epoch_length_sec", "total_weartime_min", "n_days", "weartime_hr_day") %>%
+    c("epoch_length", "total_weartime_min", "n_days", "weartime_hr_day") %>%
     {c(., setdiff(names(other_info), .))} %>%
     other_info[ ,.]
 
