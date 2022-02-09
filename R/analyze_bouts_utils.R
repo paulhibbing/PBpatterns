@@ -14,7 +14,7 @@ twoclass_runs <- function(x, target, return_everything = TRUE) {
 
 }
 
-logic_runs <- function(x, target, is_wear, minimum_bout_length = 0) {
+logic_runs <- function(x, target, is_wear, minimum_bout_epochs = 0) {
 
   stopifnot(length(is_wear) == length(x))
 
@@ -23,7 +23,7 @@ logic_runs <- function(x, target, is_wear, minimum_bout_length = 0) {
   PAutilities::index_runs(.) %>%
   within({values = as.character(values)}) %>%
   .[.$values == "TRUE TRUE", ] %>%
-  .[.$lengths >= minimum_bout_length, ]
+  .[.$lengths >= minimum_bout_epochs, ]
 
 }
 

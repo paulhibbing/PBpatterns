@@ -15,9 +15,11 @@
 #'   \code{x}, indicating whether each epoch corresponds to wear time. (For
 #'   length 1, the provided value is assigned for all epochs. Thus, the default
 #'   value of \code{TRUE} reflects assumption that all epochs are wear epochs)
-#' @param minimum_bout_length numeric filtering criterion (\code{rle_standard},
+#' @param minimum_bout_epochs numeric filtering criterion (\code{rle_standard},
 #'   \code{CRIB}, \code{SB_summary}, \code{MVPA_summary}). Bouts will be
-#'   discarded if the length is less than this amount
+#'   discarded if the length (in epochs) is less than this amount
+#' @param minimum_bout_duration_minutes same as \code{minimum_bout_epochs}, but
+#'   for functions that accept \code{epoch_length_sec} as an argument
 #' @param valid_indices numeric/integer/logical vector (\code{rle_standard},
 #'   \code{SB_summary}, \code{MVPA_summary}) specifying which elements of
 #'   \code{x} occurred on a valid day. The default (\code{NULL}) assumes all
@@ -46,10 +48,7 @@
 #'   interruption events that are allowed before a bout will be considered
 #'   invalid
 #'
-#' @note Users should note that these functions (input, code, and output)
-#'   operate by index, not duration (except where a value is required for
-#'   \code{epoch_length_sec}. That is, the functions cannot tell if each data
-#'   point represents a 1-s period, a 1-min period, or anything else. Users need
+#' @note Unless a function accepts \code{epoch_length_sec} as an argument, the units of input and output are epochs, not minutes. Users need
 #'   to take this into consideration when deciding which settings to use (e.g.
 #'   \code{longest_allowable_interruption = 12} to allow for 1-min interruptions
 #'   if input data are in 5-s epochs) and how to interpret the output (e.g.

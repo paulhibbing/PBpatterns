@@ -7,7 +7,8 @@
 #' @param is_wear logical vector indicating epoch-by-epoch classifications of
 #'   wear time (\code{TRUE}) or non-wear  (\code{FALSE})
 #' @inheritParams sb_profile_Hibbing2021
-#' @param minimum_bout_length numeric. Minimum number of epochs in a valid bout
+#' @param minimum_bout_duration_minutes numeric. Bouts shorter than this
+#'   duration will be excluded from processing
 #' @param simplify logical. Collapse output for each stratum into a single data
 #'   frame?
 #' @param probs numeric vector. Quantiles to summarize in the output
@@ -28,7 +29,7 @@
 #'   epoch_length_sec = 60
 #' )
 profile_describe_sb <- function(
-  df = NULL, is_sb, is_wear, minimum_bout_length = 5,
+  df = NULL, is_sb, is_wear, minimum_bout_duration_minutes = 5,
   valid_indices = NULL, id = NULL, counts = NULL,
   wear = NULL, sb = 100, simplify = TRUE,
   probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
@@ -41,14 +42,14 @@ profile_describe_sb <- function(
 
     analyze_bouts(
       factor(as.character(is_sb)), "TRUE", "SB_summary",
-      is_wear, minimum_bout_length, valid_indices, probs,
+      is_wear, minimum_bout_duration_minutes, valid_indices, probs,
       FALSE, epoch_length_sec
     )
 
   } else {
 
     profile_describe_sb_df(
-      df, counts, wear, id, sb, minimum_bout_length,
+      df, counts, wear, id, sb, minimum_bout_duration_minutes,
       valid_indices, simplify, probs, epoch_length_sec
     )
 
@@ -62,7 +63,7 @@ profile_describe_sb <- function(
 #' @keywords internal
 profile_describe_sb_df <- function(
   df, counts = NULL, wear = NULL, id = NULL, sb = 100,
-  minimum_bout_length = 5, valid_indices = NULL, simplify = TRUE,
+  minimum_bout_duration_minutes = 5, valid_indices = NULL, simplify = TRUE,
   probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
   epoch_length_sec
 ) {
@@ -70,16 +71,16 @@ profile_describe_sb_df <- function(
   df %>%
   profile_df_check(counts, valid_indices, id, wear) %>%
   lapply(
-    function(x, sb, minimum_bout_length, probs, epoch_length_sec) {
+    function(x, sb, minimum_bout_duration_minutes, probs, epoch_length_sec) {
       profile_describe_sb(
         is_sb = x$counts <= sb,
         is_wear = x$is_wear,
-        minimum_bout_length = minimum_bout_length,
+        minimum_bout_duration_minutes = minimum_bout_duration_minutes,
         valid_indices = x$valid_index,
         probs = probs,
         epoch_length_sec = epoch_length_sec
       )
-    }, sb, minimum_bout_length, probs, epoch_length_sec
+    }, sb, minimum_bout_duration_minutes, probs, epoch_length_sec
   ) %>%
   profile_id_bind(id, simplify)
 

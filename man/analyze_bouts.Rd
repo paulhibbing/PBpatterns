@@ -24,14 +24,14 @@ crib_bouts(
   longest_allowable_interruption = Inf,
   required_percent = 100,
   max_n_interruptions = Inf,
-  minimum_bout_length = 0
+  minimum_bout_epochs = 0
 )
 
 sb_summary_bouts(
   x,
   target,
   is_wear = TRUE,
-  minimum_bout_length = 0,
+  minimum_bout_duration_minutes = 0,
   valid_indices = NULL,
   probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
   patterns = TRUE,
@@ -42,7 +42,7 @@ mvpa_summary_bouts(
   x,
   target,
   is_wear = TRUE,
-  minimum_bout_length = 0,
+  minimum_bout_duration_minutes = 0,
   valid_indices = NULL,
   epoch_length_sec
 )
@@ -50,7 +50,7 @@ mvpa_summary_bouts(
 rle_standard_bouts(
   x,
   target,
-  minimum_bout_length = 0,
+  minimum_bout_epochs = 0,
   is_wear = TRUE,
   valid_indices = NULL
 )
@@ -89,15 +89,18 @@ compose no more than \code{100-required_percent} of the bout}
 interruption events that are allowed before a bout will be considered
 invalid}
 
-\item{minimum_bout_length}{numeric filtering criterion (\code{rle_standard},
+\item{minimum_bout_epochs}{numeric filtering criterion (\code{rle_standard},
 \code{CRIB}, \code{SB_summary}, \code{MVPA_summary}). Bouts will be
-discarded if the length is less than this amount}
+discarded if the length (in epochs) is less than this amount}
 
 \item{is_wear}{logical variable (\code{rle_standard}, \code{SB_summary},
 \code{MVPA_summary}) having either length 1 or else the same length as
 \code{x}, indicating whether each epoch corresponds to wear time. (For
 length 1, the provided value is assigned for all epochs. Thus, the default
 value of \code{TRUE} reflects assumption that all epochs are wear epochs)}
+
+\item{minimum_bout_duration_minutes}{same as \code{minimum_bout_epochs}, but
+for functions that accept \code{epoch_length_sec} as an argument}
 
 \item{valid_indices}{numeric/integer/logical vector (\code{rle_standard},
 \code{SB_summary}, \code{MVPA_summary}) specifying which elements of
@@ -135,10 +138,7 @@ Currently, the following methods are supported:
   monitors.
 }
 \note{
-Users should note that these functions (input, code, and output)
-  operate by index, not duration (except where a value is required for
-  \code{epoch_length_sec}. That is, the functions cannot tell if each data
-  point represents a 1-s period, a 1-min period, or anything else. Users need
+Unless a function accepts \code{epoch_length_sec} as an argument, the units of input and output are epochs, not minutes. Users need
   to take this into consideration when deciding which settings to use (e.g.
   \code{longest_allowable_interruption = 12} to allow for 1-min interruptions
   if input data are in 5-s epochs) and how to interpret the output (e.g.

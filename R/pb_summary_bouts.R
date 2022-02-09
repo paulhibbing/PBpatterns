@@ -2,7 +2,7 @@
 
   initialize_summary_bouts <- function(
     x, target, is_wear, valid_indices,
-    minimum_bout_length, epoch_length_sec
+    minimum_bout_duration_minutes, epoch_length_sec
   ) {
 
     ## Test input
@@ -14,8 +14,14 @@
     ## Determine all bouts (exclude any that overlap with invalid indices)
 
       bouts <-
-        logic_runs(x, target, is_wear, minimum_bout_length) %>%
-        valid_bouts(x, valid_indices)
+        minimum_bout_duration_minutes %>%
+        get_minimum_bout_epochs(epoch_length_sec) %>%
+        logic_runs(x, target, is_wear, .) %>%
+        valid_bouts(x, valid_indices) %>%
+        within({
+          lengths_min = lengths * epoch_length_sec / 60
+          lengths = NULL
+        })
 
     ## Calculate total wear time
 
@@ -39,19 +45,20 @@
   #' @keywords internal
   #' @rdname analyze_bouts
   sb_summary_bouts <- function(
-    x, target, is_wear = TRUE, minimum_bout_length = 0, valid_indices = NULL,
+    x, target, is_wear = TRUE,
+    minimum_bout_duration_minutes = 0, valid_indices = NULL,
     probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
     patterns = TRUE, epoch_length_sec
   ) {
 
     initialize_summary_bouts(
       x, target, is_wear, valid_indices,
-      minimum_bout_length, epoch_length_sec
+      minimum_bout_duration_minutes, epoch_length_sec
     )
 
     ## Assemble the summary
 
-      bouts$lengths %>%
+      bouts$lengths_min %>%
       stats::quantile(probs = probs) %>%
       t(.) %>%
       data.frame(.) %>%
@@ -64,9 +71,9 @@
       data.frame(
         epoch_length = epoch_length_sec,
         total_weartime_min = total_weartime_min,
-        minimum_SB_bout_length_threshold = minimum_bout_length,
+        minimum_SB_bout_duration_minutes = minimum_bout_duration_minutes,
         n_SB_bouts = nrow(bouts),
-        total_SB_min = sum(bouts$lengths) * epoch_length_sec / 60,
+        total_SB_min = sum(bouts$lengths_min),
         .,
         IQR = .$Q75_bout - .$Q25_bout,
         IDR = .$Q90_bout - .$Q10_bout,
@@ -81,7 +88,7 @@
         ., call = match.call(), method = "SB_summary",
         class = append(
           class(.),
-          paste0("bout", minimum_bout_length),
+          paste0("bout", minimum_bout_duration_minutes),
           0
         )
       )
@@ -91,21 +98,21 @@
   #' @keywords internal
   #' @rdname analyze_bouts
   mvpa_summary_bouts <- function(
-    x, target, is_wear = TRUE, minimum_bout_length = 0,
+    x, target, is_wear = TRUE, minimum_bout_duration_minutes = 0,
     valid_indices = NULL, epoch_length_sec
   ) {
 
     initialize_summary_bouts(
       x, target, is_wear, valid_indices,
-      minimum_bout_length, epoch_length_sec
+      minimum_bout_duration_minutes, epoch_length_sec
     )
 
     data.frame(
       epoch_length = epoch_length_sec,
       total_weartime_min = total_weartime_min,
-      minimum_MVPA_bout_length_threshold = minimum_bout_length,
+      minimum_MVPA_bout_duration_minutes = minimum_bout_duration_minutes,
       n_MVPA_bouts = nrow(bouts),
-      total_MVPA_min = sum(bouts$lengths) * epoch_length_sec / 60
+      total_MVPA_min = sum(bouts$lengths_min)
     ) %>%
     within({
       MVPA_perc = total_MVPA_min / total_weartime_min

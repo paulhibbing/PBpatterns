@@ -1,3 +1,7 @@
+get_minimum_bout_epochs <- function(minute_threshold, epoch_length) {
+  minute_threshold * 60 / epoch_length
+}
+
 valid_wear <- function(is_wear, x) {
 
   stopifnot(!anyNA(is_wear))

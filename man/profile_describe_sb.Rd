@@ -9,7 +9,7 @@ profile_describe_sb(
   df = NULL,
   is_sb,
   is_wear,
-  minimum_bout_length = 5,
+  minimum_bout_duration_minutes = 5,
   valid_indices = NULL,
   id = NULL,
   counts = NULL,
@@ -26,7 +26,7 @@ profile_describe_sb_df(
   wear = NULL,
   id = NULL,
   sb = 100,
-  minimum_bout_length = 5,
+  minimum_bout_duration_minutes = 5,
   valid_indices = NULL,
   simplify = TRUE,
   probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
@@ -43,7 +43,8 @@ sedentary behavior (\code{TRUE}) or non-sedentary (\code{FALSE})}
 \item{is_wear}{logical vector indicating epoch-by-epoch classifications of
 wear time (\code{TRUE}) or non-wear  (\code{FALSE})}
 
-\item{minimum_bout_length}{numeric. Minimum number of epochs in a valid bout}
+\item{minimum_bout_duration_minutes}{numeric. Bouts shorter than this
+duration will be excluded from processing}
 
 \item{valid_indices}{[optional] numeric/integer/logical vector specifying
 which indices of \code{is_sb} and {is_wear} correspond to valid measurement

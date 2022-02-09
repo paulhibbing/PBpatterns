@@ -7,7 +7,8 @@
 #' @param d one-row data frame with bout information
 #' @param bouts data frame with information for each bout, based on
 #'   \code{PAutilities::index_runs}
-#' @param total_length the number of rows in the original data.
+#' @param x original data stream
+#' @param epoch_length_sec numeric. The epoch length of \code{x}
 #'
 #' @keywords internal
 #' @name SB_patterns

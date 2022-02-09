@@ -10,9 +10,9 @@
 \alias{alpha}
 \title{Internal functions providing information about sedentary bout patterns}
 \usage{
-sb_patterns(d, bouts, x)
+sb_patterns(d, bouts, x, epoch_length_sec)
 
-sb_range_bouts(d, bouts)
+sb_range_bouts(d, bouts, epoch_length_sec)
 
 usual_bout_duration(d, bouts)
 
@@ -28,7 +28,9 @@ alpha(d, bouts)
 \item{bouts}{data frame with information for each bout, based on
 \code{PAutilities::index_runs}}
 
-\item{total_length}{the number of rows in the original data.}
+\item{x}{original data stream}
+
+\item{epoch_length_sec}{numeric. The epoch length of \code{x}}
 }
 \description{
 These functions are invoked in the \code{\link{analyze_bouts}} when

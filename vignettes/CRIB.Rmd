@@ -93,7 +93,7 @@ mvpa_bouts <- PBpatterns::analyze_bouts(
   longest_allowable_interruption = 2,
   required_percent = 80,
   max_n_interruptions = Inf,
-  minimum_bout_length = 10
+  minimum_bout_epochs = 10
 )
 
 ```
@@ -130,7 +130,7 @@ Here is what each piece means:
 * **max_n_interruptions = Inf** Here we specify that a valid bout can have
   unlimited interruptions as long as the criteria for
   `longest_allowable_interruption` and `required_percent` are met.
-* **minimum_bout_length = 10** Here we specify that only bouts lasting $\geq10$
+* **minimum_bout_epochs = 10** Here we specify that only bouts lasting $\geq10$
   min should be included in the output.
   
 \newpage
@@ -140,7 +140,7 @@ research question and the variable of interest. In our example, we set
 `max_n_interruptions = Inf` to avoid a restriction in that area -- similar
 approaches can be taken for other settings as well, by setting them to `0` or
 `Inf` as appropriate. (For `required_percent`, 100 is the upper limit rather
-than `Inf`.) Notably, `minimum_bout_length` is a filtering criterion. It has no
+than `Inf`.) Notably, `minimum_bout_epochs` is a filtering criterion. It has no
 direct effect on how the bouts are defined; it simply affects which ones are
 retained *after* they have been defined.
   

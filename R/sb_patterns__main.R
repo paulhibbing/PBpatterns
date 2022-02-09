@@ -15,22 +15,25 @@ sb_patterns <- function(d, bouts, x) {
 #' @keywords internal
 #' @name SB_patterns
 sb_range_bouts <- function(d, bouts) {
+
   data.frame(
     d,
+    mean_SB_bout_min = mean(bouts$lengths_min),
     sb_0_14 = sum(ifelse(
-      bouts$lengths < 15, bouts$lengths, 0
+      bouts$lengths_min < 15, bouts$lengths_min, 0
     )),
     sb_15_29 = sum(ifelse(
-      bouts$lengths >= 15 & bouts$lengths < 30, bouts$lengths, 0
+      bouts$lengths >= 15 & bouts$lengths_min < 30, bouts$lengths_min, 0
     )),
     sb_30_Inf = sum(ifelse(
-      bouts$lengths >= 30, bouts$lengths, 0
+      bouts$lengths_min >= 30, bouts$lengths_min, 0
     ))
   ) %T>%
   {stopifnot(isTRUE(all.equal(
-    sum(rev(.)[ ,1:3]), sum(bouts$lengths),
+    sum(rev(.)[ ,1:3]), sum(bouts$lengths_min),
     scale = 1, tolerance = 1/60/10
   )))}
+
 }
 
 # Duration Summarizing ----------------------------------------------------
@@ -46,7 +49,7 @@ usual_bout_duration <- function(d, bouts) {
   }
 
   df <-
-    table(bouts$lengths) %>%
+    table(bouts$lengths_min) %>%
     data.frame(stringsAsFactors = FALSE) %>%
     stats::setNames(., gsub("^Var1$", "l", names(.))) %>%
     within({
@@ -98,7 +101,7 @@ fragmentation_index <- function(d, bouts, x) {
   within({
     `break` = ifelse(end_index == length(x), 0, 1)
   }) %>%
-  {sum(.$`break`) / sum(.$lengths) * 60} %>%
+  {sum(.$`break`) / sum(.$lengths_min) * 60} %>%
   data.frame(d, fragmentation_index = .)
 }
 
@@ -107,7 +110,7 @@ fragmentation_index <- function(d, bouts, x) {
 #' @keywords internal
 #' @name SB_patterns
 gini <- function(d, bouts) {
-  data.frame(d, gini = DescTools::Gini(bouts$lengths))
+  data.frame(d, gini = DescTools::Gini(bouts$lengths_min))
 }
 
 #' @keywords internal
@@ -117,7 +120,7 @@ alpha <- function(d, bouts) {
   if (nrow(bouts) == 0) {
     data.frame(d, alpha = NA_real_, alpha_se = NA_real_)
   } else {
-    bouts$lengths %>%
+    bouts$lengths_min %>%
     sapply(., function(xi, xm) log(xi/xm), xm = min(.)) %>%
     sum(.) %>%
     {data.frame(

@@ -133,7 +133,7 @@ PBpatterns::sb_profile(
   counts = "PAXINTEN", ## Name the activity counts variable
   #wear = "is_wear", ## Name the wear time variable (TRUE for wear time, else FALSE)
   sb = 100, ## Provide the SB cut point
-  minimum_bout_length = 1, ## Minimum bout length. Must be 1 or 5
+  minimum_bout_duration_minutes = 1, ## Minimum bout length. Must be 1 or 5
   epoch_length_sec = 60, ## Tell it the epoch length of your data
   valid_indices = NULL ## Optional vector of indices that meet wear time criteria
 )
@@ -162,7 +162,7 @@ PBpatterns::sb_profile(
   id = "PAXDAY", ## Stratifying by day, just for illustration
   counts = "PAXINTEN",
   sb = 100,
-  minimum_bout_length = 5,
+  minimum_bout_duration_minutes = 5,
   epoch_length_sec = 60,
   valid_indices = valid_indices
 )
@@ -203,7 +203,7 @@ example_data$is_wear <- TRUE
 
 PBpatterns::profile_describe_sb(
   df = example_data,
-  minimum_bout_length = 1,
+  minimum_bout_duration_minutes = 1,
   id = "PAXDAY",
   wear = "is_wear",
   counts = "PAXINTEN",
@@ -244,7 +244,7 @@ print(profile)
 
 bout_info <- PBpatterns::profile_describe_sb(
   df = example_data,
-  minimum_bout_length = 1,
+  minimum_bout_duration_minutes = 1,
   id = "PAXDAY",
   wear = "is_wear",
   counts = "PAXINTEN",
