@@ -16,11 +16,36 @@ twoclass_runs <- function(x, target, return_everything = TRUE) {
 
 logic_runs <- function(x, target, is_wear, minimum_bout_length = 0) {
 
+  stopifnot(length(is_wear) == length(x))
+
   {x == target} %>%
   paste(is_wear) %>%
   PAutilities::index_runs(.) %>%
   within({values = as.character(values)}) %>%
   .[.$values == "TRUE TRUE", ] %>%
   .[.$lengths >= minimum_bout_length, ]
+
+}
+
+valid_bouts <- function(bouts, x, valid_indices = NULL) {
+
+  if (!is.null(valid_indices) & nrow(bouts) > 0){
+
+    bouts %>%
+    purrr::pmap_lgl(
+      function(start_index, end_index, valid_indices, ...) {
+        seq(start_index, end_index) %>%
+        {. %in% valid_indices} %>%
+        all(.)
+      },
+      valid_valid_indices(valid_indices, x)
+    ) %>%
+    bouts[., ]
+
+  } else {
+
+    bouts
+
+  }
 
 }

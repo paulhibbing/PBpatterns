@@ -31,10 +31,10 @@ expand_bouts.default <- function(bouts, ...) {
     call. = FALSE
   )
 
-  if (attr(bouts, "method") %in% c("rle_standard", "SB_summary")) stop(
-    "No method exists yet for expanding bouts",
-    " from the `rle_standard` technique",
-    call. = FALSE
+  no_methods <- c("rle_standard", "SB_summary", "MVPA_summary")
+  if (attr(bouts, "method") %in% no_methods) stop(
+    "No method exists (yet?) for expanding bouts when method == ",
+    attr(bouts, "method"), call. = FALSE
   )
 
   if ("other" %in% bouts$values) warning(
