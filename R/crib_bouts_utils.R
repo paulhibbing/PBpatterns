@@ -75,38 +75,3 @@ crib_check_input <- function(
   }
 
 }
-
-#' @keywords internal
-#' @rdname CRIB_internal
-check_no_bouts <- function(results, x, target) {
-
-  if (nrow(results) > 0) {
-
-    structure(results, anyBouts = TRUE)
-
-  } else {
-
-    warning(
-      "Found a case with no valid bouts -- the current solution",
-      " (returning zeroes) may not meet your needs.\nFeel free to post",
-      " an issue/pull request on GitHub.", call. = FALSE
-    )
-
-    data.frame(
-      start_index = NA_integer_,
-      end_index = NA_integer_,
-      values = target,
-      n_total_events = 0,
-      n_value_events = 0,
-      n_interruption_events = 0,
-      length_total = length(x),
-      length_value = 0,
-      length_interruption = 0,
-      longest_interruption_event = 0,
-      percent_time_engaged = 0
-    ) %>%
-    structure(anyBouts = FALSE)
-
-  }
-
-}

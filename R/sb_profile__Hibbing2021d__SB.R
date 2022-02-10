@@ -42,8 +42,8 @@ profile_describe_sb <- function(
 
     analyze_bouts(
       factor(as.character(is_sb)), "TRUE", "SB_summary",
-      is_wear, minimum_bout_duration_minutes, valid_indices, probs,
-      FALSE, epoch_length_sec
+      minimum_bout_duration_minutes, probs, FALSE,
+      epoch_length_sec, is_wear, valid_indices
     )
 
   } else {
@@ -56,8 +56,6 @@ profile_describe_sb <- function(
   }
 
 }
-
-
 
 #' @rdname profile_describe_sb
 #' @keywords internal

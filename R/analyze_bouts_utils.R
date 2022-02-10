@@ -40,11 +40,33 @@ valid_bouts <- function(bouts, x, valid_indices = NULL) {
       },
       valid_valid_indices(valid_indices, x)
     ) %>%
-    bouts[., ]
+    bouts[., ] %>%
+    structure(., anyBouts = nrow(.) > 0)
 
   } else {
 
-    bouts
+    bouts %>%
+    structure(., anyBouts = nrow(.) > 0)
+
+  }
+
+}
+
+check_no_bouts <- function(results, target, ...) {
+
+  if (nrow(results) > 0) {
+
+    results
+
+  } else {
+
+    data.frame(
+      start_index = NA_integer_,
+      end_index = NA_integer_,
+      values = target,
+      ...
+    ) %>%
+    structure(anyBouts = FALSE)
 
   }
 

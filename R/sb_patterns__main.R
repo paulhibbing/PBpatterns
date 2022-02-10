@@ -23,7 +23,7 @@ sb_range_bouts <- function(d, bouts) {
       bouts$lengths_min < 15, bouts$lengths_min, 0
     )),
     sb_15_29 = sum(ifelse(
-      bouts$lengths >= 15 & bouts$lengths_min < 30, bouts$lengths_min, 0
+      bouts$lengths_min >= 15 & bouts$lengths_min < 30, bouts$lengths_min, 0
     )),
     sb_30_Inf = sum(ifelse(
       bouts$lengths_min >= 30, bouts$lengths_min, 0

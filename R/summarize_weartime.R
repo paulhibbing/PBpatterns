@@ -74,7 +74,7 @@ summarize_weartime <- function(
     total_weartime_min <-
       d[valid_indices,is_wear] %>%
       sum(.) %>%
-      {. * (epoch_length_sec / 60)}
+      n_minutes(epoch_length_sec)
 
     if (is.null(other_info)) {
 

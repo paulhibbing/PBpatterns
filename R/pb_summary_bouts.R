@@ -15,11 +15,11 @@
 
       bouts <-
         minimum_bout_duration_minutes %>%
-        get_minimum_bout_epochs(epoch_length_sec) %>%
+        n_epochs(epoch_length_sec) %>%
         logic_runs(x, target, is_wear, .) %>%
         valid_bouts(x, valid_indices) %>%
         within({
-          lengths_min = lengths * epoch_length_sec / 60
+          lengths_min = n_minutes(lengths, epoch_length_sec)
           lengths = NULL
         })
 
@@ -29,7 +29,7 @@
         which(is_wear) %>%
         intersect(valid_indices) %>%
         length(.) %>%
-        {. * epoch_length_sec / 60}
+        n_minutes(epoch_length_sec)
 
     ## Assign results to parent frame
 
@@ -45,10 +45,10 @@
   #' @keywords internal
   #' @rdname analyze_bouts
   sb_summary_bouts <- function(
-    x, target, is_wear = TRUE,
-    minimum_bout_duration_minutes = 0, valid_indices = NULL,
+    x, target, minimum_bout_duration_minutes = 0,
     probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
-    patterns = TRUE, epoch_length_sec
+    patterns = TRUE, epoch_length_sec, is_wear = TRUE,
+    valid_indices = NULL
   ) {
 
     initialize_summary_bouts(
@@ -98,8 +98,8 @@
   #' @keywords internal
   #' @rdname analyze_bouts
   mvpa_summary_bouts <- function(
-    x, target, is_wear = TRUE, minimum_bout_duration_minutes = 0,
-    valid_indices = NULL, epoch_length_sec
+    x, target, minimum_bout_duration_minutes = 0,
+    epoch_length_sec, is_wear = TRUE, valid_indices = NULL
   ) {
 
     initialize_summary_bouts(
@@ -118,7 +118,12 @@
       MVPA_perc = total_MVPA_min / total_weartime_min
     }) %>%
     structure(
-      ., call = match.call(), method = "MVPA_summary"
+      ., call = match.call(), method = "MVPA_summary",
+      class = append(
+        class(.),
+        paste0("bout", minimum_bout_duration_minutes),
+        0
+      )
     )
 
   }

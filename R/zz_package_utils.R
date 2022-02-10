@@ -1,15 +1,18 @@
-get_minimum_bout_epochs <- function(minute_threshold, epoch_length) {
-  minute_threshold * 60 / epoch_length
+n_epochs <- function(minute_threshold, epoch_length_sec) {
+  minute_threshold * 60 / epoch_length_sec
+}
+
+n_minutes <- function(epochs, epoch_length_sec) {
+  epochs * epoch_length_sec / 60
 }
 
 valid_wear <- function(is_wear, x) {
 
   stopifnot(!anyNA(is_wear))
 
-  if (is.data.frame(x)) {
+  if (is.data.frame(x) & is.character(is_wear)) {
 
     stopifnot(
-      is.character(is_wear),
       exists(is_wear, x),
       is.logical(x[ ,is_wear])
     )
@@ -18,14 +21,16 @@ valid_wear <- function(is_wear, x) {
 
     stopifnot(is.logical(is_wear))
 
+    n <- if (is.data.frame(x)) 1:nrow(x) else length(x)
+
     if (length(is_wear)==1) {
       if (!is_wear) warning(
         "Setting `is_wear = FALSE` will result in no bouts being detected",
         call. = FALSE
       )
-      is_wear <- rep(is_wear, length(x))
+      is_wear <- rep(is_wear, n)
     } else{
-      stopifnot(length(is_wear) == length(x))
+      stopifnot(length(is_wear) == n)
     }
 
   }
