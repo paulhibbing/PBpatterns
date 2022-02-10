@@ -8,26 +8,30 @@ troiano_mvpa_bouts <- function(
 ) {
 
   twoclass_runs(x, target, FALSE) %>%
-  data.frame(
-    .,
-    is_start = sapply(
-      .$start_index,
-      function(index, x, target, activation_window, activation) {
-        x[seq(index, index + activation_window - 1)] %>%
-        {sum(. %in% target)} %>%
-        {. >= activation}
-      },
-      x,
-      target,
-      n_epochs(activation_window_min, epoch_length_sec),
-      n_epochs(activation_min, epoch_length_sec)
-    ),
-    is_end = c(
-      utils::tail(.$start_index, -1) - utils::head(.$end_index, -1) - 1 >=
-      n_epochs(termination_min, epoch_length_sec),
-      TRUE
+  {if (nrow(.) == 0) {
+    data.frame(., is_start = logical(), is_end = logical())
+  } else {
+    data.frame(
+      .,
+      is_start = sapply(
+        .$start_index,
+        function(index, x, target, activation_window, activation) {
+          x[seq(index, index + activation_window - 1)] %>%
+            {sum(. %in% target)} %>%
+            {. >= activation}
+        },
+        x,
+        target,
+        n_epochs(activation_window_min, epoch_length_sec),
+        n_epochs(activation_min, epoch_length_sec)
+      ),
+      is_end = c(
+        utils::tail(.$start_index, -1) - utils::head(.$end_index, -1) - 1 >=
+          n_epochs(termination_min, epoch_length_sec),
+        TRUE
+      )
     )
-  ) %>%
+  }} %>%
   troiano_bout_summarize(
     x, target, epoch_length_sec,
     minimum_bout_duration_minutes
