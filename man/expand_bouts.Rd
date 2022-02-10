@@ -28,6 +28,8 @@ intensity <- cut(
   c("SB", "LPA", "MVPA"),
   right = FALSE
 )
-bouts <- analyze_bouts(intensity, "MVPA", "Troiano_MVPA")
+bouts <- analyze_bouts(
+  intensity, "MVPA", "Troiano_MVPA", epoch_length_sec = 60
+)
 expand_bouts(bouts)[910:940]
 }

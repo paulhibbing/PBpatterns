@@ -186,7 +186,6 @@ we can use the `profile_describe_sb` function in one of two ways:
 
 ```{r dist, cache=TRUE}
 
-
 PBpatterns::profile_describe_sb(
   is_sb = example_data$PAXINTEN <= 100, ## SB cut point
   is_wear = TRUE, ## Assume all epochs are wear time

@@ -89,11 +89,12 @@ mvpa_bouts <- PBpatterns::analyze_bouts(
   x = intensity,
   method = "CRIB",
   target = "MVPA",
-  target_buffer = 30,
-  longest_allowable_interruption = 2,
+  target_buffer_mins = 30,
+  longest_allowable_interruption_mins = 2,
   required_percent = 80,
   max_n_interruptions = Inf,
-  minimum_bout_epochs = 10
+  minimum_bout_duration_minutes = 10,
+  epoch_length_sec = 60
 )
 
 ```
@@ -167,17 +168,15 @@ This is a data frame with one row per bout. The variables are:
   reference to the `values` column)
 * **n_interruption_events** The number of distinct interruption events
   occurring between `start_index` and `end_index`
-* **length_total** The combined duration of all `value`
+* **overall_minutes** The combined duration of all `value`
   and `interruption` events
-* **length_value** The combined duration of all `value` events
-* **length_interruption** The combined duration of all `interruption` events
-* **longest_interruption_event** The duration of the single longest
-  interruption event
+* **engaged_minutes** The combined duration of all `value` events
 * **percent_time_engaged** Percentage of `length_total` comprised
   by `length_value`
-  
-As before, epoch length influences the interpretation of length variables. Keep
-that in mind.
+* **total_interruption_minutes** The combined duration of
+  all `interruption` events
+* **longest_interruption_minutes** The duration of the single longest
+  interruption event
 
 \newpage
 
