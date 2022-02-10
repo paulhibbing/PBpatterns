@@ -26,9 +26,10 @@ I have tried to write it as non-technically as possible, in recognition that
 most people are not R programmers, and many are not coders at all. That said,
 the profiles were created in R, and they need to be implemented in R. So I will
 not be able to avoid technical talk altogether. If you feel anything could be
-clearer, you are probably not alone. Please reach out on the Issues page
-(https://github.com/paulhibbing/PBpatterns/issues) and let me know what doesn't
-work or doesn't make sense. Others will thank you, and so will I!
+clearer, you are probably not alone. Please [reach out on the Issues
+page](https://github.com/paulhibbing/PBpatterns/issues/new/choose) and let me
+know what doesn't work or doesn't make sense. Others will thank you, and so will
+I!
 
 Before you proceed with the vignette, you will need to install the following
 free programs, if you haven't already:
