@@ -20,37 +20,41 @@ analyze_bouts(
 crib_bouts(
   x,
   target,
-  target_buffer,
-  longest_allowable_interruption = Inf,
+  target_buffer_mins,
+  longest_allowable_interruption_mins = Inf,
   required_percent = 100,
   max_n_interruptions = Inf,
-  minimum_bout_epochs = 0
+  minimum_bout_duration_minutes = 0,
+  epoch_length_sec,
+  is_wear = TRUE,
+  valid_indices = NULL
 )
 
 sb_summary_bouts(
   x,
   target,
-  is_wear = TRUE,
   minimum_bout_duration_minutes = 0,
-  valid_indices = NULL,
   probs = c(0.1, 0.2, 0.25, seq(0.3, 0.7, 0.1), 0.75, 0.8, 0.9),
   patterns = TRUE,
-  epoch_length_sec
+  epoch_length_sec,
+  is_wear = TRUE,
+  valid_indices = NULL
 )
 
 mvpa_summary_bouts(
   x,
   target,
-  is_wear = TRUE,
   minimum_bout_duration_minutes = 0,
-  valid_indices = NULL,
-  epoch_length_sec
+  epoch_length_sec,
+  is_wear = TRUE,
+  valid_indices = NULL
 )
 
 rle_standard_bouts(
   x,
   target,
-  minimum_bout_epochs = 0,
+  minimum_bout_duration_minutes = 0,
+  epoch_length_sec,
   is_wear = TRUE,
   valid_indices = NULL
 )
@@ -58,9 +62,13 @@ rle_standard_bouts(
 troiano_mvpa_bouts(
   x,
   target,
-  activation_window = 10,
+  activation_window_min = 10,
   activation_min = 8,
-  termination_min = 3
+  termination_min = 3,
+  minimum_bout_duration_minutes = 10,
+  epoch_length_sec,
+  is_wear = TRUE,
+  valid_indices = NULL
 )
 }
 \arguments{
@@ -74,11 +82,12 @@ troiano_mvpa_bouts(
 \item{...}{arguments passed to the method function being wrapped (see
 \code{usage} section, above)}
 
-\item{target_buffer}{numeric (\code{CRIB}). Maximum separation between runs
-of \code{target}, beyond which they will not be clustered together}
+\item{target_buffer_mins}{numeric (\code{CRIB}). Maximum separation (in
+minutes) between runs of \code{target}, beyond which they will not be
+clustered together}
 
-\item{longest_allowable_interruption}{numeric (\code{CRIB}). The maximum
-length for any single interruption in a valid bout}
+\item{longest_allowable_interruption_mins}{numeric (\code{CRIB}). The maximum
+length (in minutes) for any single interruption in a valid bout}
 
 \item{required_percent}{numeric (1-100; \code{CRIB}). The minimum percentage
 of the full bout period that must be spent engaging in the target behavior.
@@ -89,41 +98,38 @@ compose no more than \code{100-required_percent} of the bout}
 interruption events that are allowed before a bout will be considered
 invalid}
 
-\item{minimum_bout_epochs}{numeric filtering criterion (\code{rle_standard},
-\code{CRIB}, \code{SB_summary}, \code{MVPA_summary}). Bouts will be
-discarded if the length (in epochs) is less than this amount}
+\item{minimum_bout_duration_minutes}{\emph{[optional argument available for
+all methods]} a numeric filtering criterion. Bouts will be discarded if the
+length (in epochs) is less than this amount}
 
-\item{is_wear}{logical variable (\code{rle_standard}, \code{SB_summary},
-\code{MVPA_summary}) having either length 1 or else the same length as
-\code{x}, indicating whether each epoch corresponds to wear time. (For
-length 1, the provided value is assigned for all epochs. Thus, the default
-value of \code{TRUE} reflects assumption that all epochs are wear epochs)}
+\item{epoch_length_sec}{\emph{[REQUIRED argument for all methods]} a numeric
+scalar giving the epoch length of \code{x}, in seconds}
 
-\item{minimum_bout_duration_minutes}{same as \code{minimum_bout_epochs}, but
-for functions that accept \code{epoch_length_sec} as an argument}
+\item{is_wear}{\emph{[optional argument available for all methods]} a logical
+scalar (or vector, as long as its length equals the length of \code{x}),
+indicating whether each epoch corresponds to wear time. For length 1, the
+provided value is assigned for all epochs. Thus, the default value of
+\code{TRUE} reflects assumption that all epochs are wear epochs}
 
-\item{valid_indices}{numeric/integer/logical vector (\code{rle_standard},
-\code{SB_summary}, \code{MVPA_summary}) specifying which elements of
-\code{x} occurred on a valid day. The default (\code{NULL}) assumes all
-elements are valid}
+\item{valid_indices}{\emph{[optional argument available for all methods]} a
+numeric/integer/logical vector specifying which elements of \code{x}
+occurred on a valid day. The default (\code{NULL}) assumes all elements are
+valid}
 
 \item{probs}{quantile values to return (\code{SB_summary})}
 
 \item{patterns}{logical (\code{SB_summary}). Append the output with extra
 sedentary pattern variables?}
 
-\item{epoch_length_sec}{numeric (\code{SB_summary}, \code{MVPA_summary}). The
-epoch_length of \code{x}}
+\item{activation_window_min}{numeric (\code{Troiano_MVPA}). Size of window
+(in minutes) to use when searching for a bout activation}
 
-\item{activation_window}{numeric (\code{Troiano_MVPA}). Size of window
-(number of epochs) to use when searching for a bout activation}
-
-\item{activation_min}{numeric (\code{Troiano_MVPA}). Number of epochs in
+\item{activation_min}{numeric (\code{Troiano_MVPA}). Number of minutes in
 \code{activation_window} that must equal \code{target} for an activation to
 be detected}
 
 \item{termination_min}{numeric (\code{Troiano_MVPA}). Number of consecutive
-non-\code{target} epochs required to terminate a bout}
+non-\code{target} minutes required to terminate a bout}
 }
 \description{
 \code{analyze_bouts} is a universal function that serves as a wrapper for
@@ -132,39 +138,16 @@ section).
 }
 \details{
 Currently, the following methods are supported:
-  \code{"rle_standard"}, \code{"Troiano_MVPA"}, \code{"CRIB"},
+  \code{"rle_standard"}, \code{"CRIB"}, \code{"Troiano_MVPA"},
   \code{"SB_summary"}, and \code{"MVPA_summary"}. More can easily be added
-  over time, including those designed for specific behaviors or activity
-  monitors.
-}
-\note{
-Unless a function accepts \code{epoch_length_sec} as an argument, the units of input and output are epochs, not minutes. Users need
-  to take this into consideration when deciding which settings to use (e.g.
-  \code{longest_allowable_interruption = 12} to allow for 1-min interruptions
-  if input data are in 5-s epochs) and how to interpret the output (e.g.
-  \code{length == 12} corresponds to one minute if data are in 5-s epochs).
+  over time, including more \code{*_summary} methods or others that are
+  designed for specific behaviors or activity monitors.
 }
 \section{CRIB}{
 
 
-  \code{CRIB} returns a data frame formatted as follows:
-
-  \describe{ \item{start_index}{The start index of the bout period}
-  \item{end_index}{The end index of the bout period} \item{values}{The target
-  behavior (the name is a vestige of \code{PAutilities::index_runs})}
-  \item{n_total_events}{The number of distinct behavior runs in the bout
-  period. Equal to the sum of \code{n_value_events} and
-  \code{n_interruption_events}} \item{n_value_events}{The number of distinct
-  occurrences of the target behavior} \item{n_interruption events}{The number
-  of distinct occurrences of interruptive behavior} \item{length_total}{The
-  total number of indices comprising the bout period} \item{length_value}{The
-  number of indices spent engaged in the target behavior}
-  \item{length_interruption}{The number of indices spent engaged in
-  interruptive behavior} \item{longest_interruption_event}{The number of
-  indices comprising the longest interruption event}
-  \item{percent_time_engaged}{The percentage (0-100) of \code{length_total}
-  that was spent engaging in \code{target}, equal to \code{length_value /
-  length_total * 100}} }
+  For help understanding output when \code{method == "CRIB"}, see
+  \code{\link{CRIB_output}}
 }
 
 \section{*_summary}{
@@ -184,11 +167,11 @@ x <- cut(
   right = FALSE
 )
 
-analyze_bouts(x, "MVPA", "rle_standard")[1:6, ]
+analyze_bouts(x, "MVPA", "rle_standard", epoch_length_sec = 60)[1:6, ]
 \donttest{
-analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10)
+analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10, 60)
 }
-analyze_bouts(x, "MVPA", "Troiano_MVPA")
+analyze_bouts(x, "MVPA", "Troiano_MVPA", epoch_length_sec = 60)
 \donttest{
 analyze_bouts(x, "SB", "SB_summary", is_wear = TRUE, epoch_length_sec = 60)
 }
@@ -197,6 +180,8 @@ analyze_bouts(x, "MVPA", "MVPA_summary", is_wear = TRUE, epoch_length_sec = 60)
 }
 \seealso{
 \href{https://journals.lww.com/acsm-msse/pages/articleviewer.aspx?year=2008&issue=01000&article=00025&type=Fulltext}{Troiano
-et al. (2008)} \code{\link{expand_bouts}}
+et al. (2008)}
+\code{\link{expand_bouts}}
+\code{\link{plot.bouts}}
 }
 \keyword{internal}

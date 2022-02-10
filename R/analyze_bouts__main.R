@@ -10,36 +10,28 @@
 #' @param method character. The bout classifying method to use. See details.
 #' @param ... arguments passed to the method function being wrapped (see
 #'   \code{usage} section, above)
-#' @param is_wear logical variable (\code{rle_standard}, \code{SB_summary},
-#'   \code{MVPA_summary}) having either length 1 or else the same length as
-#'   \code{x}, indicating whether each epoch corresponds to wear time. (For
-#'   length 1, the provided value is assigned for all epochs. Thus, the default
-#'   value of \code{TRUE} reflects assumption that all epochs are wear epochs)
-#' @param minimum_bout_epochs numeric filtering criterion (\code{rle_standard},
-#'   \code{CRIB}, \code{SB_summary}, \code{MVPA_summary}). Bouts will be
-#'   discarded if the length (in epochs) is less than this amount
-#' @param minimum_bout_duration_minutes same as \code{minimum_bout_epochs}, but
-#'   for functions that accept \code{epoch_length_sec} as an argument
-#' @param valid_indices numeric/integer/logical vector (\code{rle_standard},
-#'   \code{SB_summary}, \code{MVPA_summary}) specifying which elements of
-#'   \code{x} occurred on a valid day. The default (\code{NULL}) assumes all
-#'   elements are valid
-#' @param probs quantile values to return (\code{SB_summary})
-#' @param patterns logical (\code{SB_summary}). Append the output with extra
-#'   sedentary pattern variables?
-#' @param epoch_length_sec numeric (\code{SB_summary}, \code{MVPA_summary}). The
-#'   epoch_length of \code{x}
-#' @param activation_window numeric (\code{Troiano_MVPA}). Size of window
-#'   (number of epochs) to use when searching for a bout activation
-#' @param activation_min numeric (\code{Troiano_MVPA}). Number of epochs in
-#'   \code{activation_window} that must equal \code{target} for an activation to
-#'   be detected
-#' @param termination_min numeric (\code{Troiano_MVPA}). Number of consecutive
-#'   non-\code{target} epochs required to terminate a bout
-#' @param target_buffer numeric (\code{CRIB}). Maximum separation between runs
-#'   of \code{target}, beyond which they will not be clustered together
-#' @param longest_allowable_interruption numeric (\code{CRIB}). The maximum
-#'   length for any single interruption in a valid bout
+#'
+#' @param is_wear \emph{[optional argument available for all methods]} a logical
+#'   scalar (or vector, as long as its length equals the length of \code{x}),
+#'   indicating whether each epoch corresponds to wear time. For length 1, the
+#'   provided value is assigned for all epochs. Thus, the default value of
+#'   \code{TRUE} reflects assumption that all epochs are wear epochs
+#' @param valid_indices \emph{[optional argument available for all methods]} a
+#'   numeric/integer/logical vector specifying which elements of \code{x}
+#'   occurred on a valid day. The default (\code{NULL}) assumes all elements are
+#'   valid
+#' @param minimum_bout_duration_minutes \emph{[optional argument available for
+#'   all methods]} a numeric filtering criterion. Bouts will be discarded if the
+#'   length (in epochs) is less than this amount
+#'
+#' @param epoch_length_sec \emph{[REQUIRED argument for all methods]} a numeric
+#'   scalar giving the epoch length of \code{x}, in seconds
+#'
+#' @param target_buffer_mins numeric (\code{CRIB}). Maximum separation (in
+#'   minutes) between runs of \code{target}, beyond which they will not be
+#'   clustered together
+#' @param longest_allowable_interruption_mins numeric (\code{CRIB}). The maximum
+#'   length (in minutes) for any single interruption in a valid bout
 #' @param required_percent numeric (1-100; \code{CRIB}). The minimum percentage
 #'   of the full bout period that must be spent engaging in the target behavior.
 #'   Stated differently, this threshold stipulates that interruptions can
@@ -48,38 +40,28 @@
 #'   interruption events that are allowed before a bout will be considered
 #'   invalid
 #'
-#' @note Unless a function accepts \code{epoch_length_sec} as an argument, the units of input and output are epochs, not minutes. Users need
-#'   to take this into consideration when deciding which settings to use (e.g.
-#'   \code{longest_allowable_interruption = 12} to allow for 1-min interruptions
-#'   if input data are in 5-s epochs) and how to interpret the output (e.g.
-#'   \code{length == 12} corresponds to one minute if data are in 5-s epochs).
+#' @param activation_window_min numeric (\code{Troiano_MVPA}). Size of window
+#'   (in minutes) to use when searching for a bout activation
+#' @param activation_min numeric (\code{Troiano_MVPA}). Number of minutes in
+#'   \code{activation_window} that must equal \code{target} for an activation to
+#'   be detected
+#' @param termination_min numeric (\code{Troiano_MVPA}). Number of consecutive
+#'   non-\code{target} minutes required to terminate a bout
+#'
+#' @param probs quantile values to return (\code{SB_summary})
+#' @param patterns logical (\code{SB_summary}). Append the output with extra
+#'   sedentary pattern variables?
 #'
 #' @details Currently, the following methods are supported:
-#'   \code{"rle_standard"}, \code{"Troiano_MVPA"}, \code{"CRIB"},
+#'   \code{"rle_standard"}, \code{"CRIB"}, \code{"Troiano_MVPA"},
 #'   \code{"SB_summary"}, and \code{"MVPA_summary"}. More can easily be added
-#'   over time, including those designed for specific behaviors or activity
-#'   monitors.
+#'   over time, including more \code{*_summary} methods or others that are
+#'   designed for specific behaviors or activity monitors.
 #'
 #' @section CRIB:
 #'
-#'   \code{CRIB} returns a data frame formatted as follows:
-#'
-#'   \describe{ \item{start_index}{The start index of the bout period}
-#'   \item{end_index}{The end index of the bout period} \item{values}{The target
-#'   behavior (the name is a vestige of \code{PAutilities::index_runs})}
-#'   \item{n_total_events}{The number of distinct behavior runs in the bout
-#'   period. Equal to the sum of \code{n_value_events} and
-#'   \code{n_interruption_events}} \item{n_value_events}{The number of distinct
-#'   occurrences of the target behavior} \item{n_interruption events}{The number
-#'   of distinct occurrences of interruptive behavior} \item{length_total}{The
-#'   total number of indices comprising the bout period} \item{length_value}{The
-#'   number of indices spent engaged in the target behavior}
-#'   \item{length_interruption}{The number of indices spent engaged in
-#'   interruptive behavior} \item{longest_interruption_event}{The number of
-#'   indices comprising the longest interruption event}
-#'   \item{percent_time_engaged}{The percentage (0-100) of \code{length_total}
-#'   that was spent engaging in \code{target}, equal to \code{length_value /
-#'   length_total * 100}} }
+#'   For help understanding output when \code{method == "CRIB"}, see
+#'   \code{\link{CRIB_output}}
 #'
 #' @section *_summary:
 #'
@@ -88,7 +70,9 @@
 #'
 #' @seealso
 #' \href{https://journals.lww.com/acsm-msse/pages/articleviewer.aspx?year=2008&issue=01000&article=00025&type=Fulltext}{Troiano
-#' et al. (2008)} \code{\link{expand_bouts}}
+#' et al. (2008)}
+#' \code{\link{expand_bouts}}
+#' \code{\link{plot.bouts}}
 #'
 #' @examples
 #' data(example_data, package = "PBpatterns")
@@ -100,11 +84,11 @@
 #'   right = FALSE
 #' )
 #'
-#' analyze_bouts(x, "MVPA", "rle_standard")[1:6, ]
+#' analyze_bouts(x, "MVPA", "rle_standard", epoch_length_sec = 60)[1:6, ]
 #' \donttest{
-#' analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10)
+#' analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10, 60)
 #' }
-#' analyze_bouts(x, "MVPA", "Troiano_MVPA")
+#' analyze_bouts(x, "MVPA", "Troiano_MVPA", epoch_length_sec = 60)
 #' \donttest{
 #' analyze_bouts(x, "SB", "SB_summary", is_wear = TRUE, epoch_length_sec = 60)
 #' }
