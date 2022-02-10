@@ -53,7 +53,7 @@ Once you have the package installed, all you need is some activity data and the
 `analyze_bouts` function. For this demonstration, let's use some sample NHANES
 data.
 
-```{r data, cache=TRUE}
+```{r data, cache=FALSE}
 
 data(example_data, package = "PBpatterns")
 
@@ -66,7 +66,7 @@ physical activity ($PAXINTEN\:\:101-759$), or MVPA ($PAXINTEN \geq 760$).
 
 \newpage
 
-```{r prep, cache=TRUE}
+```{r prep, cache=FALSE}
 
 ## Determine minute-by-minute intensity
 intensity <- cut(
@@ -83,7 +83,7 @@ intensity <- cut(
 Once we have our data (`intensity` in this case), we can plug
 it into `analyze_bouts`. Let's see the code first, then go over what it means.
 
-```{r bouts, cache=TRUE}
+```{r bouts, cache=FALSE}
 
 mvpa_bouts <- PBpatterns::analyze_bouts(
   x = intensity,
@@ -143,7 +143,7 @@ ones are retained *after* they have been defined.
 
 Now let's take a look at the output and go over what it means:
 
-```{r output, cache=TRUE}
+```{r output, cache=FALSE}
 mvpa_bouts
 ```
 
@@ -180,7 +180,7 @@ In some cases we may want to convert our bout information back to the original
 length of the input (i.e., `intensity`). We can use the `expand_bouts` function
 to accomplish that.
 
-```{r expansion, cache=TRUE}
+```{r expansion, cache=FALSE}
 expanded <- PBpatterns::expand_bouts(mvpa_bouts)
 str(expanded)
 table(expanded)
@@ -188,7 +188,7 @@ table(expanded)
 
 And we can also append that new variable into our original dataset as well.
 
-```{r expansion2, cache=TRUE}
+```{r expansion2, cache=FALSE}
 example_data$intensity <- expanded
 head(example_data)
 ```
@@ -200,7 +200,7 @@ head(example_data)
 If you want to visualize the results of your bout analysis, you can use a basic
 `plot` function.
 
-```{r plotting, cache=TRUE, fig.width=7, fig.height=5, fig.align='center'}
+```{r plotting, cache=FALSE, fig.width=7, fig.height=5, fig.align='center'}
 plot(mvpa_bouts)
 ```
 

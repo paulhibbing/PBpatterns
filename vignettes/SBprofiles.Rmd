@@ -125,7 +125,7 @@ you can do so via the `PhysicalActivity` package. (That's the same approach
 specialized way, which is why the code isn't exported.) You can see some sample
 code for doing this in [the section on managing your own accelerometer data](#finalsection).
 
-```{r bouts, cache=TRUE}
+```{r bouts, cache=FALSE}
 
 PBpatterns::sb_profile(
   object = example_data, ## Give it the data you want to evaluate
@@ -143,7 +143,7 @@ PBpatterns::sb_profile(
 
 Let's change the settings to illustrate how else this could work.
 
-```{r bouts2, cache=TRUE}
+```{r bouts2, cache=FALSE}
 
 ## Randomly sample 8000 row numbers to use as "valid indices". In a real
 ## analysis, you might use this approach to specify which rows occurred on days
@@ -185,7 +185,7 @@ we can use the `profile_describe_sb` function in one of two ways:
 
 ## 1) By directly providing information for one person
 
-```{r dist, cache=TRUE}
+```{r dist, cache=FALSE}
 
 PBpatterns::profile_describe_sb(
   is_sb = example_data$PAXINTEN <= 100, ## SB cut point
@@ -197,7 +197,7 @@ PBpatterns::profile_describe_sb(
 
 ## 2) By providing data frame input and setting up a stratified analysis (much like we did for `sb_profile`)
 
-```{r dist2, cache=TRUE}
+```{r dist2, cache=FALSE}
 
 example_data$is_wear <- TRUE
 
@@ -222,7 +222,7 @@ Using our example data, we could implement this two-step process like so:
 
 ## Method 1 above
 
-```{r twostep1, cache=TRUE}
+```{r twostep1, cache=FALSE}
 
 bout_info <- PBpatterns::profile_describe_sb(
   is_sb = example_data$PAXINTEN <= 100,
@@ -240,7 +240,7 @@ print(profile)
 
 ## Method 2 above
 
-```{r twostep2, cache=TRUE}
+```{r twostep2, cache=FALSE}
 
 bout_info <- PBpatterns::profile_describe_sb(
   df = example_data,
@@ -271,7 +271,7 @@ use these same concepts on your specific data. In many cases, the tools are
 probably out there. If not, you might end up being the one to provide them by
 the time you're finished!
 
-```{r AG, cache=TRUE}
+```{r AG, cache=FALSE}
 
 ## First, make sure you have the right packages installed
 
