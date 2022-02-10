@@ -58,6 +58,7 @@ Applies to output from the \code{*_summary} methods of
     split(example_data, example_data$PAXDAY),
      ~ analyze_bouts(
        .x$intensity, "SB", "SB_summary",
+       is_wear = .x$is_wear,
        valid_indices = .x$valid_index,
        epoch_length_sec = 60
      )
@@ -65,8 +66,12 @@ Applies to output from the \code{*_summary} methods of
 
   mvpa_bouts <- purrr::map_df(
     split(example_data, example_data$PAXDAY),
-    ~ analyze_bouts(.x$intensity, "MVPA", "MVPA_summary",
-    valid_indices = .x$valid_index, epoch_length_sec = 60)
+    ~ analyze_bouts(
+      .x$intensity, "MVPA", "MVPA_summary",
+      is_wear = .x$is_wear,
+      valid_indices = .x$valid_index,
+      epoch_length_sec = 60
+      )
   )
 
   d <- merge(weartime_info, sb_bouts)

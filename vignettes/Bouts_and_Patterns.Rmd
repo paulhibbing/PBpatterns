@@ -1,0 +1,350 @@
+---
+title: "Bout Analysis and Sedentary Patterns"
+author: "Paul R. Hibbing"
+output: rmarkdown::pdf_document
+urlcolor: blue
+linkcolor: blue
+vignette: >
+  %\VignetteIndexEntry{Bout Analysis and Sedentary Patterns}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(PBpatterns)
+```
+
+## Introduction and Installation
+
+This vignette will show you how to use `PBpatterns` for analyzing bouts (of any
+physical behavior) and sedentary patterns (specifically). The first step is
+making sure you have the `PBpatterns` package installed on your computer. Here's
+how:
+
+```{r install, eval=FALSE}
+
+## remotes is a package that makes it easy to install packages from GitHub, but
+## in my experience it sometimes struggles to install the related packages (i.e.,
+## dependencies) correctly. So first we'll do a manual workaround. All it's
+## doing is looking through a list of required packages, and installing any of
+## them that haven't already been installed (they'll be skipped if they have).
+## Be aware: Some of these packages may have long installation times.
+
+invisible(lapply(
+  c(
+    "DescTools", "ggplot2", "magrittr", "PAutilities", "purrr", "utils",
+    "AGread", "PhysicalActivity", "tree", "randomForest", "knitr", "rmarkdown"
+  ),
+  function(x) if (!x %in% installed.packages()) install.packages(x)
+))
+
+## Once that's done, we can (hopefully) install from GitHub
+remotes::install_github("paulhibbing/PBpatterns", dependencies = FALSE)
+
+```
+
+Copy and paste the above into your R console, then hit enter to run it.
+
+## Preparation
+
+After installation (and just like for the [CRIB
+method](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/CRIB.pdf)),
+all you need is some activity data and the `analyze_bouts` function. For this
+demonstration, let's use some sample NHANES data.
+
+```{r data, cache=TRUE}
+
+data(example_data, package = "PBpatterns")
+
+```
+
+This dataset has activity counts that we can use to look at bouts of sedentary
+behavior (SB), light physical activity (LPA), and moderate-to-vigorous physical
+activity (MVPA). For illustration, let's say we initially coded our data as SB
+($PAXINTEN \leq 100$), LPA ($PAXINTEN\:\:101-759$), or MVPA ($PAXINTEN \geq
+760$).
+
+\newpage
+
+```{r prep, cache=TRUE}
+
+## Determine minute-by-minute intensity
+x <- cut(
+  example_data$PAXINTEN,
+  breaks = c(-Inf, 101, 760, Inf),
+  labels = c("SB", "LPA", "MVPA"),
+  right = FALSE
+)
+
+```
+
+To see how we can use this in the `analyze_bouts` function, first it's a good
+idea to view the help page for that function.
+
+```{r help, eval=FALSE}
+
+?PBpatterns::analyze_bouts
+
+```
+
+## Basic Usage and Available Methods
+
+Any call to `analyze_bouts` will start with the same three elements: `x`,
+`target`, and `method`.
+
+```{r basics, eval=FALSE}
+
+## This code is for illustration -- it will throw an informative error if you
+## try to run it, but don't worry -- we will see how to use the rest of the code
+## in a bit
+
+PBpatterns::analyze_bouts(
+  x = x,
+  target = "MVPA",
+  method = c(
+    ## Choose from:
+    "rle_standard",
+    "CRIB",
+    "Troiano_MVPA",
+    "SB_summary",
+    "MVPA_summary"
+  )
+)
+
+```
+
+The first couple of arguments are pretty straightforward:
+
+* **x** is the data you want to analyze. It needs to be a factor variable. 
+* **target** is the level of `x` for which you want the bout information.
+
+The `method` argument is ever so slighltly more involved. As you can see, there
+are currently five available methods:
+
+* **rle_standard** This is the traditional method based on run-length encoding.
+It simply returns information (start index, end index, and duration) about every
+distinct occurrence.
+* **CRIB** See the [CRIB vignette](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/CRIB.pdf)
+* **Troiano_MVPA** This is the method of [Troiano et al.
+(2008)](https://journals.lww.com/acsm-msse/pages/articleviewer.aspx?year=2008&issue=01000&article=00025&type=Fulltext)
+for assessing bouts of MVPA.
+* **SB_summary** This is the option to select if you want to analyze sedentary
+patterns. It's also the driving function behind the `profile_describe_sb`
+described in the [sedentary profiles
+vignette](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/SBprofiles.pdf).
+* **MVPA_summary** This method is similar to `SB_summary`, but simpler and
+focused on MVPA instead of SB.
+
+The first three methods return a data frame with one row per bout. The
+`*_summary` methods return a one-row data frame that summarizes all of the
+bouts.
+
+## Completing the Call and Understanding the Output
+
+Each method requires one more argument (`epoch_length_sec`) to run properly.
+Additionally, you can provide values for arguments called `is_wear` (wear time
+indicator), `valid_indices` (valid day indicator), and
+`minimum_bout_duration_minutes` (the shortest allowable bout length) to them
+all. Apart from that, there are specialized settings you can feed into each
+method. This is where the help file (see `?PBpatterns::analyze_bouts`) is so
+important, as noted above. In that file, you can see what the relevant arguments
+are for each method. In most cases, there are well-defined default values, so
+you probably won't need to provide any extra information. But it's still good to
+know what's possible. In the case of `CRIB`, there are some arguments for which
+a default value can't be defined. So you can expect to see informative errors if
+you don't specify them all. Let's look at some code now.
+
+### Run-Length Encoding Standard Method
+
+```{r standard, cache=TRUE}
+
+standard_bouts <- PBpatterns::analyze_bouts(
+  x, "SB", "rle_standard", epoch_length_sec = 60
+)
+
+head(standard_bouts)
+
+```
+
+### CRIB
+
+See the [CRIB vignette](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/CRIB.pdf).
+
+### Troiano MVPA
+
+```{r troiano, cache=TRUE}
+
+troiano_bouts <- PBpatterns::analyze_bouts(
+  x, "MVPA", "Troiano_MVPA", epoch_length_sec = 60
+)
+
+head(troiano_bouts)
+
+```
+
+### SB Summary
+
+```{r SB, cache=TRUE}
+
+## Note the warning this gives about returning NA for the predicted usual bout
+## duration
+
+SB_patterns <- PBpatterns::analyze_bouts(
+  x, "SB", "SB_summary", epoch_length_sec = 60
+)
+
+SB_patterns
+
+```
+
+For this method, the output yields many variables. Some are self-explanatory,
+but others may be more cryptic (particularly those used for sedentary profiles).
+Here are explanations for the ones that need it:
+
+* The **Q\*\_bout** variables are bout length percentiles, in minutes.
+* **IQR** and **IDR** are the interquartile and interdecile ranges,
+respectively, in minutes
+* **SB\_perc** is the percentage of total time that was spent sedentary
+* **bout\_frequency** is given in bouts per hour of wear time
+* **sb\_0\_14**, **sb\_15\_29**, and **sb\_30\_Inf** give total sedentary time
+(minutes) in bouts of $< 15$ minutes, $15-29.9$ minutes, and $\geq 30$ minutes,
+respectively
+* **ubd\_empirical** is the usual bout duration (minutes), calculated from the
+observed data
+* **ubd\_predicted** is the usual bout duration (minutes), calculated using a
+lonlinear modeling method
+* **fragmentation\_index** is given as sedentary breaks per sedentary hour
+* **gini** is the Gini index
+* **alpha** is alpha from the power law distribution (see [Chastin & Granat
+(2010)](https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X))
+* **alpha\_se** is the standard error for `alpha`
+
+### MVPA Summary
+
+```{r MVPA, cache=TRUE}
+
+MVPA_patterns <- PBpatterns::analyze_bouts(
+  x, "MVPA", "MVPA_summary", epoch_length_sec = 60
+)
+
+MVPA_patterns
+
+```
+
+## Further Tools for Sedentary Pattern Analysis
+
+There are a couple more tools in `PBpatterns` that can be leveraged for research
+focused on sedentary patterns. The first is `summarize_weartime`, and its
+general usage looks like this:
+
+```{r weartime, cache=TRUE}
+
+## First, add a timestamp variable to example_data
+example_data$timestamp <- seq(
+  as.POSIXlt(Sys.Date()),
+  by = "1 min",
+  length.out = nrow(example_data)
+)
+
+## Then, add a random wear time indicator to `example_data` (in real life, you
+## might use the `PhysicalActivity` package for this)
+set.seed(610)
+example_data$is_wear <- sample(c(FALSE, TRUE), nrow(example_data), TRUE)
+
+## Now, run the function
+PBpatterns::summarize_weartime(example_data, "is_wear", "timestamp")
+
+```
+
+On its own, this function is somewhat unremarkable. The real power comes into
+play when we combine it with other package code. For the next chunk, we will
+use the `purrr` package to apply functions separately for each day in the
+`example_data` object, then combine the results. This is a concise approach, but
+might be tough to follow -- Don't worry too much about the specifics. This is
+just for illustration, and in the real world you can accomplish the same thing
+using a [for
+loop](https://www.datacamp.com/community/tutorials/tutorial-on-loops-in-r?utm_source=adwords_ppc&utm_medium=cpc&utm_campaignid=1658343521&utm_adgroupid=63833879975&utm_device=c&utm_keyword=for%20loop%20r&utm_matchtype=p&utm_network=g&utm_adpostion=&utm_creative=469789579350&utm_targetid=aud-517318241987:kwd-300177784001&utm_loc_interest_ms=&utm_loc_physical_ms=9023228&gclid=Cj0KCQiAjJOQBhCkARIsAEKMtO0WwT-kkNOrl9igPUceKrAjKurpqvUs4oTNFE56Lg5NuPwiBly1w-MaAqoyEALw_wcB)
+or any other approach you're comfortable with. (Be aware of some [looping
+limitations and
+alternatives](https://www.r-bloggers.com/2016/01/strategies-to-speedup-r-code/),
+though. In R, I prefer to use loops for saving an output data file in each
+iteration, rather than appending the iteration's result to an existing object.)
+
+```{r demo, cache=TRUE}
+
+## Save intensity as a variable in the dataset
+example_data$intensity <- x
+
+## For simplicity, label each row of data as valid
+example_data$valid_index <- TRUE
+
+## Extract information about wear time, SB patterns, and MVPA (a common covariate)
+weartime_info <- purrr::map_df(
+  split(example_data, example_data$PAXDAY),
+  ~ summarize_weartime(.x, "is_wear", "timestamp", .x$valid_index)
+)
+
+sb_bouts <- purrr::map_df(
+  split(example_data, example_data$PAXDAY),
+   ~ analyze_bouts(
+     .x$intensity, "SB", "SB_summary",
+     is_wear = .x$is_wear,
+     valid_indices = .x$valid_index,
+     epoch_length_sec = 60
+    )
+)
+
+mvpa_bouts <- purrr::map_df(
+  split(example_data, example_data$PAXDAY),
+  ~ analyze_bouts(
+      .x$intensity, "MVPA", "MVPA_summary",
+      is_wear = .x$is_wear,
+      valid_indices = .x$valid_index,
+      epoch_length_sec = 60
+    )
+)
+
+## Now combine all the above pieces of information (This works because all the
+## objects have matching and unique `epoch_length` and `total_weartime_min`
+## columns). In real life, you wouldn't have a guarantee of this. Thus, you
+## would need to set up the merge using additional indicators.
+
+d <- merge(weartime_info, sb_bouts)
+d <- merge(d, mvpa_bouts)
+
+```
+
+Now that we have our combined weartime/SB/MVPA dataset (the object called `d`),
+we can use the `adjust_bout_summaries` function to calculate residualized
+variables suitable for modeling.
+
+```{r residualize, cache=TRUE}
+
+## Set `verbose` to TRUE if you want console updates about what's happening
+adjust_bout_summaries(d, verbose = FALSE)
+
+```
+This code added several variables:
+
+* **SB\_hr\_day** is daily SB time (hours/day)
+* **MVPA\_min\_day** is daily MVPA time (minutes/day) -- it's equivalent to
+`total_MVPA_min` because of the way we set up this illustration
+* **adj\_total\_SB** is adjusted total SB (hours/day)
+* **adj\_mean\_SB\_bout** is adjusted mean SB bout length (minutes)
+* **adj\_sb\_0\_14**, **adj\_sb\_15\_29**, and **adj\_sb\_30\_Inf** are adjusted
+SB time (minutes) in bouts of $< 15$ minutes, $15-29.9$ minutes, and $\geq 30$
+minutes, respectively
+* **adj\_median\_sb\_bout** is the adjusted median bout duration (minutes)
+* **adj\_MVPA** is adjusted MVPA time (minutes)
+
+## Wrapping Up
+
+This should get you on your way to using `PBpatterns` for your analyses. As
+always, feel free to [post an
+issue](https://github.com/paulhibbing/PBpatterns/issues/new/choose) if something
+can be improved. This is a big effort, and a definite work in progress, so
+suggestions and tips are appreciated!
