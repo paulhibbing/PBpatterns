@@ -1,3 +1,9 @@
+# PBpatterns 0.2.1
+
+* Edited vignettes, primarily to avoid predicted UBD error in the bout analysis
+  and sedentary patterns vignette
+
+
 # PBpatterns 0.2.0
 
 * Funnelled a lot of code through `analyze_bouts`

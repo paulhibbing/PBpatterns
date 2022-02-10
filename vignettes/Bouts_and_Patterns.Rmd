@@ -54,26 +54,63 @@ Copy and paste the above into your R console, then hit enter to run it.
 After installation (and just like for the [CRIB
 method](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/CRIB.pdf)),
 all you need is some activity data and the `analyze_bouts` function. For this
-demonstration, let's use some sample NHANES data.
+demonstration, let's use some sample NHANES data. We'll also do some convenient
+pre-processing based on wear time analysis from the `PhysicalActivity` package.
 
 ```{r data, cache=FALSE}
 
+## Load the data
 data(example_data, package = "PBpatterns")
+
+## Check that `PhysicalActivity` is installed
+if (!"PhysicalActivity" %in% installed.packages()) install.packages(
+  "PhysicalActivity"
+)
+
+## Add a timestamp variable to satisfy `PhysicalActivity` requirements
+example_data$TimeStamp <- seq(
+  as.POSIXlt("2020-02-02", "UTC"),
+  by = "1 min",
+  length.out = nrow(example_data)
+)
+
+## Now label wear minutes
+example_data <- PhysicalActivity::wearingMarking(
+  example_data, perMinuteCts = 1, cts = "PAXINTEN",
+  newcolname = "is_wear", getMinuteMarking = TRUE
+)
+
+## Format the `is_wear` variable as logical
+example_data$is_wear <- example_data$is_wear == "w"
+
+## And lastly, label valid indices (i.e., those that occur on days with at least
+## 10 h of wear time) -- This is an abstract way of doing it that just so
+## happens to work because of how the `PAXDAY` variable is formatted. It's not
+## crucial to understand how this is working. Other solutions will apply to most
+## datasets, but I have chosen this approach here because it is concise
+example_data$valid_index <- as.vector(tapply(
+  example_data$is_wear, example_data$PAXDAY, sum
+))[example_data$PAXDAY] >= 600
+
+## Here's a summary of what this tells us:
+ftable(xtabs(~PAXDAY+valid_index+is_wear, example_data))
 
 ```
 
-This dataset has activity counts that we can use to look at bouts of sedentary
-behavior (SB), light physical activity (LPA), and moderate-to-vigorous physical
-activity (MVPA). For illustration, let's say we initially coded our data as SB
-($PAXINTEN \leq 100$), LPA ($PAXINTEN\:\:101-759$), or MVPA ($PAXINTEN \geq
-760$).
+All the days are valid based on our criteria, with wear time ranging from just
+over 10 hours (617 minutes on day 5) to around 14.5 hours (874 minutes on day 6).
 
-\newpage
+Now, let's look at intensity classifications and subsequent analysis of
+intensity bouts. This dataset has activity counts that we can use to look at
+bouts of sedentary behavior (SB), light physical activity (LPA), and
+moderate-to-vigorous physical activity (MVPA). For illustration, let's say we
+initially coded our data as SB ($PAXINTEN \leq 100$), LPA
+($PAXINTEN\:\:101-759$), or MVPA ($PAXINTEN \geq 760$).
 
 ```{r prep, cache=FALSE}
 
 ## Determine minute-by-minute intensity
-x <- cut(
+example_data$intensity <- cut(
   example_data$PAXINTEN,
   breaks = c(-Inf, 101, 760, Inf),
   labels = c("SB", "LPA", "MVPA"),
@@ -81,6 +118,8 @@ x <- cut(
 )
 
 ```
+
+\newpage
 
 To see how we can use this in the `analyze_bouts` function, first it's a good
 idea to view the help page for that function.
@@ -163,7 +202,7 @@ you don't specify them all. Let's look at some code now.
 ```{r standard, cache=FALSE}
 
 standard_bouts <- PBpatterns::analyze_bouts(
-  x, "SB", "rle_standard", epoch_length_sec = 60
+  example_data$intensity, "SB", "rle_standard", epoch_length_sec = 60
 )
 
 head(standard_bouts)
@@ -179,22 +218,29 @@ See the [CRIB vignette](https://github.com/paulhibbing/PBpatterns/blob/main/vign
 ```{r troiano, cache=FALSE}
 
 troiano_bouts <- PBpatterns::analyze_bouts(
-  x, "MVPA", "Troiano_MVPA", epoch_length_sec = 60
+  example_data$intensity, "MVPA", "Troiano_MVPA", epoch_length_sec = 60
 )
 
 head(troiano_bouts)
 
 ```
 
+\newpage
+
 ### SB Summary {#SBsummary}
 
 ```{r SB, cache=FALSE}
 
-## Note the warning this gives about returning NA for the predicted usual bout
-## duration
+## Note that here, we are providing extra information about wear time and valid
+## days. This is optional, but it is a really good idea. In this case, if we
+## don't provide this information, we will get a warning about failure to
+## calculate the predicted usual bout duration.
 
 SB_patterns <- PBpatterns::analyze_bouts(
-  x, "SB", "SB_summary", epoch_length_sec = 60
+  example_data$intensity, "SB", "SB_summary",
+  is_wear = example_data$is_wear,
+  valid_indices = example_data$valid_index,
+  epoch_length_sec = 60
 )
 
 SB_patterns
@@ -234,7 +280,7 @@ lonlinear modeling method
 ```{r MVPA, cache=FALSE}
 
 MVPA_patterns <- PBpatterns::analyze_bouts(
-  x, "MVPA", "MVPA_summary", epoch_length_sec = 60
+  example_data$intensity, "MVPA", "MVPA_summary", epoch_length_sec = 60
 )
 
 MVPA_patterns
@@ -252,20 +298,7 @@ general usage looks like this:
 
 ```{r weartime, cache=FALSE}
 
-## First, add a timestamp variable to example_data
-example_data$timestamp <- seq(
-  as.POSIXlt(Sys.Date()),
-  by = "1 min",
-  length.out = nrow(example_data)
-)
-
-## Then, add a random wear time indicator to `example_data` (in real life, you
-## might use the `PhysicalActivity` package for this)
-set.seed(610)
-example_data$is_wear <- sample(c(FALSE, TRUE), nrow(example_data), TRUE)
-
-## Now, run the function
-PBpatterns::summarize_weartime(example_data, "is_wear", "timestamp")
+PBpatterns::summarize_weartime(example_data, "is_wear", "TimeStamp")
 
 ```
 
@@ -283,20 +316,13 @@ alternatives](https://www.r-bloggers.com/2016/01/strategies-to-speedup-r-code/),
 though. In R, I prefer to use loops for saving an output data file in each
 iteration, rather than appending the iteration's result to an existing object.)
 
-\newpage
-
 ```{r demo, cache=FALSE}
 
-## Save intensity as a variable in the dataset
-example_data$intensity <- x
-
-## For simplicity, label each row of data as valid
-example_data$valid_index <- TRUE
-
-## Extract information about wear time, SB patterns, and MVPA (a common covariate)
+## Extract information about wear time, SB patterns, and MVPA (a common
+## covariate in sedentary pattern analysis)
 weartime_info <- purrr::map_df(
   split(example_data, example_data$PAXDAY),
-  ~ summarize_weartime(.x, "is_wear", "timestamp", .x$valid_index)
+  ~ summarize_weartime(.x, "is_wear", "TimeStamp", .x$valid_index)
 )
 
 sb_bouts <- purrr::map_df(
@@ -308,6 +334,7 @@ sb_bouts <- purrr::map_df(
      epoch_length_sec = 60
     )
 )
+
 
 mvpa_bouts <- purrr::map_df(
   split(example_data, example_data$PAXDAY),
@@ -322,7 +349,8 @@ mvpa_bouts <- purrr::map_df(
 ## Now combine all the above pieces of information (This works because all the
 ## objects have matching and unique `epoch_length` and `total_weartime_min`
 ## columns). In real life, you wouldn't have a guarantee of this. Thus, you
-## would need to set up the merge using additional indicators.
+## would need to set up the merge using additional indicators (participant IDs
+## and potentially dates as well).
 
 d <- merge(weartime_info, sb_bouts)
 d <- merge(d, mvpa_bouts)
@@ -339,7 +367,9 @@ variables suitable for modeling.
 adjust_bout_summaries(d, verbose = FALSE)
 
 ```
-This code added several variables:
+\newpage
+
+The preceding code added several variables:
 
 * **SB\_hr\_day** is daily SB time (hours/day)
 * **sb\_0\_14\_hr\_day**, **sb\_15\_29\_hr\_day**, and **sb\_30\_Inf\_hr\_day**
@@ -360,5 +390,5 @@ minutes, respectively
 This should get you on your way to using `PBpatterns` for your analyses. As
 always, feel free to [post an
 issue](https://github.com/paulhibbing/PBpatterns/issues/new/choose) if something
-can be improved. This is a big effort, and a definite work in progress, so
-suggestions and tips are appreciated!
+can be improved. This definitely a work in progress, so suggestions and tips are
+appreciated!
