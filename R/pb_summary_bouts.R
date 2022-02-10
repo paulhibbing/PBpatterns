@@ -71,7 +71,7 @@
       data.frame(
         epoch_length = epoch_length_sec,
         total_weartime_min = total_weartime_min,
-        minimum_SB_bout_duration_minutes = minimum_bout_duration_minutes,
+        SB_bout_exclusion_threshold_minutes = minimum_bout_duration_minutes,
         n_SB_bouts = nrow(bouts),
         total_SB_min = sum(bouts$lengths_min),
         .,
@@ -110,7 +110,7 @@
     data.frame(
       epoch_length = epoch_length_sec,
       total_weartime_min = total_weartime_min,
-      minimum_MVPA_bout_duration_minutes = minimum_bout_duration_minutes,
+      MVPA_bout_exclusion_threshold_minutes = minimum_bout_duration_minutes,
       n_MVPA_bouts = nrow(bouts),
       total_MVPA_min = sum(bouts$lengths_min)
     ) %>%

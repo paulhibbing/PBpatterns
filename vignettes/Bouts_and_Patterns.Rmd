@@ -56,7 +56,7 @@ method](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/CRIB.pdf))
 all you need is some activity data and the `analyze_bouts` function. For this
 demonstration, let's use some sample NHANES data.
 
-```{r data, cache=TRUE}
+```{r data, cache=FALSE}
 
 data(example_data, package = "PBpatterns")
 
@@ -70,7 +70,7 @@ activity (MVPA). For illustration, let's say we initially coded our data as SB
 
 \newpage
 
-```{r prep, cache=TRUE}
+```{r prep, cache=FALSE}
 
 ## Determine minute-by-minute intensity
 x <- cut(
@@ -98,8 +98,8 @@ Any call to `analyze_bouts` will start with the same three elements: `x`,
 
 ```{r basics, eval=FALSE}
 
-## This code is for illustration -- it will throw an informative error if you
-## try to run it, but don't worry -- we will see how to use the rest of the code
+## This code is for illustration only. It will throw an informative error if you
+## try to run it, but don't worry -- We will see how to use the rest of the code
 ## in a bit
 
 PBpatterns::analyze_bouts(
@@ -160,7 +160,7 @@ you don't specify them all. Let's look at some code now.
 
 ### Run-Length Encoding Standard Method
 
-```{r standard, cache=TRUE}
+```{r standard, cache=FALSE}
 
 standard_bouts <- PBpatterns::analyze_bouts(
   x, "SB", "rle_standard", epoch_length_sec = 60
@@ -176,7 +176,7 @@ See the [CRIB vignette](https://github.com/paulhibbing/PBpatterns/blob/main/vign
 
 ### Troiano MVPA
 
-```{r troiano, cache=TRUE}
+```{r troiano, cache=FALSE}
 
 troiano_bouts <- PBpatterns::analyze_bouts(
   x, "MVPA", "Troiano_MVPA", epoch_length_sec = 60
@@ -186,9 +186,9 @@ head(troiano_bouts)
 
 ```
 
-### SB Summary
+### SB Summary {#SBsummary}
 
-```{r SB, cache=TRUE}
+```{r SB, cache=FALSE}
 
 ## Note the warning this gives about returning NA for the predicted usual bout
 ## duration
@@ -205,6 +205,10 @@ For this method, the output yields many variables. Some are self-explanatory,
 but others may be more cryptic (particularly those used for sedentary profiles).
 Here are explanations for the ones that need it:
 
+* **SB\_bout\_exclusion\_threshold\_minutes** reflects the setting that was
+provided for \newline `minimum_bout_duration_minutes` -- It is renamed in the output to
+avoid misinterpretation. (The latter term is clear when making the function
+call, but not necessarily when interpreting the output)
 * The **Q\*\_bout** variables are bout length percentiles, in minutes.
 * **IQR** and **IDR** are the interquartile and interdecile ranges,
 respectively, in minutes
@@ -223,9 +227,11 @@ lonlinear modeling method
 (2010)](https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X))
 * **alpha\_se** is the standard error for `alpha`
 
+\newpage
+
 ### MVPA Summary
 
-```{r MVPA, cache=TRUE}
+```{r MVPA, cache=FALSE}
 
 MVPA_patterns <- PBpatterns::analyze_bouts(
   x, "MVPA", "MVPA_summary", epoch_length_sec = 60
@@ -234,6 +240,9 @@ MVPA_patterns <- PBpatterns::analyze_bouts(
 MVPA_patterns
 
 ```
+Interpretation of this output is pretty straightforward. The
+`MVPA_bout_exclusion_threshold_minutes` variable is interpreted the same way as
+its counterpart discussed in [SB Summary](#SBsummary) above.
 
 ## Further Tools for Sedentary Pattern Analysis
 
@@ -241,7 +250,7 @@ There are a couple more tools in `PBpatterns` that can be leveraged for research
 focused on sedentary patterns. The first is `summarize_weartime`, and its
 general usage looks like this:
 
-```{r weartime, cache=TRUE}
+```{r weartime, cache=FALSE}
 
 ## First, add a timestamp variable to example_data
 example_data$timestamp <- seq(
@@ -274,7 +283,9 @@ alternatives](https://www.r-bloggers.com/2016/01/strategies-to-speedup-r-code/),
 though. In R, I prefer to use loops for saving an output data file in each
 iteration, rather than appending the iteration's result to an existing object.)
 
-```{r demo, cache=TRUE}
+\newpage
+
+```{r demo, cache=FALSE}
 
 ## Save intensity as a variable in the dataset
 example_data$intensity <- x
@@ -322,7 +333,7 @@ Now that we have our combined weartime/SB/MVPA dataset (the object called `d`),
 we can use the `adjust_bout_summaries` function to calculate residualized
 variables suitable for modeling.
 
-```{r residualize, cache=TRUE}
+```{r residualize, cache=FALSE}
 
 ## Set `verbose` to TRUE if you want console updates about what's happening
 adjust_bout_summaries(d, verbose = FALSE)
@@ -331,12 +342,15 @@ adjust_bout_summaries(d, verbose = FALSE)
 This code added several variables:
 
 * **SB\_hr\_day** is daily SB time (hours/day)
+* **sb\_0\_14\_hr\_day**, **sb\_15\_29\_hr\_day**, and **sb\_30\_Inf\_hr\_day**
+are sedentary time (hours/day) in bouts of $< 15$ minutes, $15-29.9$ minutes,
+and $\geq 30$ minutes, respectively
 * **MVPA\_min\_day** is daily MVPA time (minutes/day) -- it's equivalent to
 `total_MVPA_min` because of the way we set up this illustration
 * **adj\_total\_SB** is adjusted total SB (hours/day)
 * **adj\_mean\_SB\_bout** is adjusted mean SB bout length (minutes)
 * **adj\_sb\_0\_14**, **adj\_sb\_15\_29**, and **adj\_sb\_30\_Inf** are adjusted
-SB time (minutes) in bouts of $< 15$ minutes, $15-29.9$ minutes, and $\geq 30$
+SB time (hours/day) in bouts of $< 15$ minutes, $15-29.9$ minutes, and $\geq 30$
 minutes, respectively
 * **adj\_median\_sb\_bout** is the adjusted median bout duration (minutes)
 * **adj\_MVPA** is adjusted MVPA time (minutes)

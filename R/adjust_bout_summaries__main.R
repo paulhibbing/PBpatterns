@@ -85,15 +85,15 @@ adjust_bout_summaries <- function(d, verbose = FALSE) {
     "adj_mean_SB_bout", verbose
   ) %>%
   PAutilities::residual_adjust(
-    "sb_0_14", "weartime_hr_day",
+    "sb_0_14_hr_day", "weartime_hr_day",
     "adj_sb_0_14", verbose
   ) %>%
   PAutilities::residual_adjust(
-    "sb_15_29", "weartime_hr_day",
+    "sb_15_29_hr_day", "weartime_hr_day",
     "adj_sb_15_29", verbose
   ) %>%
   PAutilities::residual_adjust(
-    "sb_30_Inf", "weartime_hr_day",
+    "sb_30_Inf_hr_day", "weartime_hr_day",
     "adj_sb_30_Inf", verbose
   ) %>%
   PAutilities::residual_adjust(

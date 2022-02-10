@@ -19,18 +19,18 @@ sb_range_bouts <- function(d, bouts) {
   data.frame(
     d,
     mean_SB_bout_min = mean(bouts$lengths_min),
-    sb_0_14 = sum(ifelse(
+    sb_0_14_hr = sum(ifelse(
       bouts$lengths_min < 15, bouts$lengths_min, 0
-    )),
-    sb_15_29 = sum(ifelse(
+    )) / 60,
+    sb_15_29_hr = sum(ifelse(
       bouts$lengths_min >= 15 & bouts$lengths_min < 30, bouts$lengths_min, 0
-    )),
-    sb_30_Inf = sum(ifelse(
+    )) / 60,
+    sb_30_Inf_hr = sum(ifelse(
       bouts$lengths_min >= 30, bouts$lengths_min, 0
-    ))
+    )) / 60
   ) %T>%
   {stopifnot(isTRUE(all.equal(
-    sum(rev(.)[ ,1:3]), sum(bouts$lengths_min),
+    sum(rev(.)[ ,1:3]), sum(bouts$lengths_min) / 60,
     scale = 1, tolerance = 1/60/10
   )))}
 

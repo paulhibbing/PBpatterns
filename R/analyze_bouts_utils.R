@@ -56,7 +56,8 @@ check_no_bouts <- function(results, target, ...) {
 
   if (nrow(results) > 0) {
 
-    results
+    results %>%
+    within({values = target})
 
   } else {
 
