@@ -1,3 +1,9 @@
+# PBpatterns 0.2.2
+
+* Tweaked `analyze_bouts` to ensure the `CRIB` and `Troiano_MVPA` methods are
+  able to account for empty data
+
+
 # PBpatterns 0.2.1
 
 * Edited vignettes, primarily to avoid predicted UBD error in the bout analysis
