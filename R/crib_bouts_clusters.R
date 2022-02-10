@@ -19,11 +19,25 @@ crib_clusters <- function(
     longest_allowable_interruption, max_n_interruptions
   ) %>%
 
-  structure(., h = .$h) %>%
-  within({
-    h = NULL
-    group = NULL
-  })
+  {if (!length(.)) {
+
+    data.frame(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA) %>%
+    stats::setNames(c(
+      "start_index", "end_index", "n_total_events", "n_value_events",
+      "n_interruption_events", "length_total", "length_value",
+      "length_interruption", "longest_interruption_event",
+      "percent_time_engaged"
+    )) %>%
+    .[-1, ] %>%
+    structure(h = NA)
+
+  } else{
+    structure(., h = .$h) %>%
+    within({
+      h = NULL
+      group = NULL
+    })
+  }}
 
 }
 
