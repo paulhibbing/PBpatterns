@@ -84,13 +84,14 @@ example_data <- PhysicalActivity::wearingMarking(
 example_data$is_wear <- example_data$is_wear == "w"
 
 ## And lastly, label valid indices (i.e., those that occur on days with at least
-## 10 h of wear time) -- This is an abstract way of doing it that just so
-## happens to work because of how the `PAXDAY` variable is formatted. It's not
-## crucial to understand how this is working. Other solutions will apply to most
-## datasets, but I have chosen this approach here because it is concise
-example_data$valid_index <- as.vector(tapply(
-  example_data$is_wear, example_data$PAXDAY, sum
-))[example_data$PAXDAY] >= 600
+## 10 h of wear time). This is a bit of an abstract call -- you can think of it
+## as a loop that labels each individual element of `PAXDAY` with the total wear
+## time for that whole day.
+example_data$valid_index <- sapply(
+  example_data$PAXDAY,
+  function(i, vec) vec[match(i, names(vec))],
+  vec = tapply(example_data$is_wear, example_data$PAXDAY, sum)
+) >= 600
 
 ## Here's a summary of what this tells us:
 ftable(xtabs(~PAXDAY+valid_index+is_wear, example_data))

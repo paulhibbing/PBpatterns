@@ -1,5 +1,11 @@
 # PBpatterns 0.2.2
 
+* Tweaked the way `example_data$valid_index` is calculated in the `Bout Analysis
+and Sedentary Patterns` vignette
+
+
+# PBpatterns 0.2.2
+
 * Tweaked `analyze_bouts` to ensure the `CRIB` and `Troiano_MVPA` methods are
   able to account for empty data
 
