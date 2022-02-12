@@ -1,9 +1,9 @@
 Package: PBpatterns
 Type: Package
 Title: Analyze Patterns of Physical Behavior
-Version: 0.2.3.9000
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Version: 0.2.4
+Author: Paul R. Hibbing
+Maintainer: Paul R. Hibbing <prhibbing@cmh.edu>
 Description: Useful for assessing sedentary patterns and profiles,
     bouts of physical activity or sleep, and more.
 License: MIT + file LICENSE

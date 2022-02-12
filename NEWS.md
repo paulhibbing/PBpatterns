@@ -1,4 +1,9 @@
-# PBpatterns 0.2.2
+# PBpatterns 0.2.4
+
+* Filled in missing DESCRIPTION fields
+
+
+# PBpatterns 0.2.3
 
 * Tweaked the way `example_data$valid_index` is calculated in the `Bout Analysis
 and Sedentary Patterns` vignette
