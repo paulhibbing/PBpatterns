@@ -32,10 +32,11 @@
 #'   clustered together
 #' @param longest_allowable_interruption_mins numeric (\code{CRIB}). The maximum
 #'   length (in minutes) for any single interruption in a valid bout
-#' @param required_percent numeric (1-100; \code{CRIB}). The minimum percentage
-#'   of the full bout period that must be spent engaging in the target behavior.
-#'   Stated differently, this threshold stipulates that interruptions can
-#'   compose no more than \code{100-required_percent} of the bout
+#' @param required_percent numeric (1-100; \code{CRIB} and
+#'   \code{Ostendorf_MVPA}). The minimum percentage of the full bout period that
+#'   must be spent engaging in the target behavior. Stated differently, this
+#'   threshold stipulates that interruptions can compose no more than
+#'   \code{100-required_percent} of the bout
 #' @param max_n_interruptions numeric (\code{CRIB}). The maximum number of
 #'   interruption events that are allowed before a bout will be considered
 #'   invalid
@@ -45,8 +46,9 @@
 #' @param activation_min numeric (\code{Troiano_MVPA}). Number of minutes in
 #'   \code{activation_window} that must equal \code{target} for an activation to
 #'   be detected
-#' @param termination_min numeric (\code{Troiano_MVPA}). Number of consecutive
-#'   non-\code{target} minutes required to terminate a bout
+#' @param termination_min numeric (\code{Troiano_MVPA} and
+#'   \code{Ostendorf_MVPA}). Number of consecutive non-\code{target} minutes
+#'   required to terminate a bout
 #'
 #' @param probs quantile values to return (\code{SB_summary})
 #' @param patterns logical (\code{SB_summary}). Append the output with extra
@@ -54,9 +56,9 @@
 #'
 #' @details Currently, the following methods are supported:
 #'   \code{"rle_standard"}, \code{"CRIB"}, \code{"Troiano_MVPA"},
-#'   \code{"SB_summary"}, and \code{"MVPA_summary"}. More can easily be added
-#'   over time, including more \code{*_summary} methods or others that are
-#'   designed for specific behaviors or activity monitors.
+#'   \code{"Ostendorf_MVPA"}, \code{"SB_summary"}, and \code{"MVPA_summary"}.
+#'   More can easily be added over time, including more \code{*_summary} methods
+#'   or others that are designed for specific behaviors or activity monitors.
 #'
 #' @section CRIB:
 #'
@@ -71,6 +73,7 @@
 #' @seealso
 #' \href{https://journals.lww.com/acsm-msse/pages/articleviewer.aspx?year=2008&issue=01000&article=00025&type=Fulltext}{Troiano
 #' et al. (2008)}
+#' \href{https://onlinelibrary.wiley.com/doi/abs/10.1002/oby.22052}{Ostendorf et al. (2018)}
 #' \code{\link{expand_bouts}}
 #' \code{\link{plot.bouts}}
 #'
@@ -89,6 +92,7 @@
 #' analyze_bouts(x, "MVPA", "CRIB", 20, 5, 50, 3, 10, 60)
 #' }
 #' analyze_bouts(x, "MVPA", "Troiano_MVPA", epoch_length_sec = 60)
+#' analyze_bouts(x, "MVPA", "Ostendorf_MVPA", epoch_length_sec = 60)
 #' \donttest{
 #' analyze_bouts(x, "SB", "SB_summary", is_wear = TRUE, epoch_length_sec = 60)
 #' }
@@ -97,7 +101,7 @@
 #' @export
 analyze_bouts <- function(
   x, target, method = c(
-    "rle_standard", "CRIB", "Troiano_MVPA",
+    "rle_standard", "CRIB", "Troiano_MVPA", "Ostendorf_MVPA",
     "SB_summary", "MVPA_summary"
   ), ...
 ) {
@@ -129,6 +133,7 @@ analyze_bouts <- function(
       "rle_standard" = rle_standard_bouts(x, target, ...),
       "CRIB" = crib_bouts(x, target, ...),
       "Troiano_MVPA" = troiano_mvpa_bouts(x, target, ...),
+      "Ostendorf_MVPA" = ostendorf_mvpa_bouts(x, target, ...),
       "SB_summary" = sb_summary_bouts(x, target, ...),
       "MVPA_summary" = mvpa_summary_bouts(x, target, ...),
       stop(

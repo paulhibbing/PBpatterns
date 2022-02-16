@@ -25,10 +25,8 @@ troiano_mvpa_bouts <- function(
         n_epochs(activation_window_min, epoch_length_sec),
         n_epochs(activation_min, epoch_length_sec)
       ),
-      is_end = c(
-        utils::tail(.$start_index, -1) - utils::head(.$end_index, -1) - 1 >=
-          n_epochs(termination_min, epoch_length_sec),
-        TRUE
+      is_end = run_end(
+        .$start_index, .$end_index, termination_min, epoch_length_sec
       )
     )
   }} %>%

@@ -27,6 +27,12 @@ logic_runs <- function(x, target, is_wear, minimum_bout_epochs = 0) {
 
 }
 
+run_end <- function(start_index, end_index, termination_min, epoch_length_sec) {
+  {utils::tail(start_index, -1) - utils::head(end_index, -1) - 1} %>%
+  {. >= n_epochs(termination_min, epoch_length_sec)} %>%
+  c(TRUE)
+}
+
 valid_bouts <- function(bouts, x, valid_indices = NULL) {
 
   if (!is.null(valid_indices) & nrow(bouts) > 0){

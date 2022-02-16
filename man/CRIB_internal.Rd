@@ -52,10 +52,11 @@ crib_check_input(x, target = NULL, required_percent, target_buffer)
 
 \item{target}{the level of \code{x} for which to examine bouts}
 
-\item{required_percent}{numeric (1-100; \code{CRIB}). The minimum percentage
-of the full bout period that must be spent engaging in the target behavior.
-Stated differently, this threshold stipulates that interruptions can
-compose no more than \code{100-required_percent} of the bout}
+\item{required_percent}{numeric (1-100; \code{CRIB} and
+\code{Ostendorf_MVPA}). The minimum percentage of the full bout period that
+must be spent engaging in the target behavior. Stated differently, this
+threshold stipulates that interruptions can compose no more than
+\code{100-required_percent} of the bout}
 
 \item{max_n_interruptions}{numeric (\code{CRIB}). The maximum number of
 interruption events that are allowed before a bout will be considered

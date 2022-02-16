@@ -65,7 +65,7 @@ crib_check_input <- function(
   stopifnot(length(target) == 1)
   stopifnot(required_percent <= 100)
 
-  if (required_percent < 1) {
+  if (required_percent <= 1) {
     warning(
       "required_percent should be a percentage,",
       " not a proportion.\nDid you mean to pass ",

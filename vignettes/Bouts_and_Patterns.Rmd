@@ -150,6 +150,7 @@ PBpatterns::analyze_bouts(
     "rle_standard",
     "CRIB",
     "Troiano_MVPA",
+    "Ostendorf_MVPA",
     "SB_summary",
     "MVPA_summary"
   )
@@ -172,6 +173,8 @@ distinct occurrence.
 * **Troiano_MVPA** This is the method of [Troiano et al.
 (2008)](https://journals.lww.com/acsm-msse/pages/articleviewer.aspx?year=2008&issue=01000&article=00025&type=Fulltext)
 for assessing bouts of MVPA.
+* **Ostendorf_MVPA** This is the method of [Ostendorf et al.
+(2018)](https://onlinelibrary.wiley.com/doi/full/10.1002/oby.22052) for assessing bouts of MVPA.
 * **SB_summary** This is the option to select if you want to analyze sedentary
 patterns. It's also the driving function behind the `profile_describe_sb`
 described in the [sedentary profiles
@@ -228,6 +231,18 @@ head(troiano_bouts)
 
 \newpage
 
+### Ostendorf MVPA
+
+```{r ostendorf, cache=FALSE}
+
+ostendorf_bouts <- PBpatterns::analyze_bouts(
+  example_data$intensity, "MVPA", "Ostendorf_MVPA", epoch_length_sec = 60
+)
+
+head(ostendorf_bouts)
+
+```
+
 ### SB Summary {#SBsummary}
 
 ```{r SB, cache=FALSE}
@@ -274,8 +289,6 @@ lonlinear modeling method
 (2010)](https://www.sciencedirect.com/science/article/abs/pii/S096663620900602X))
 * **alpha\_se** is the standard error for `alpha`
 
-\newpage
-
 ### MVPA Summary
 
 ```{r MVPA, cache=FALSE}
@@ -304,18 +317,20 @@ PBpatterns::summarize_weartime(example_data, "is_wear", "TimeStamp")
 ```
 
 On its own, this function is somewhat unremarkable. The real power comes into
-play when we combine it with other package code. For the next chunk, we will
-use the `purrr` package to apply functions separately for each day in the
-`example_data` object, then combine the results. This is a concise approach, but
-might be tough to follow -- Don't worry too much about the specifics. This is
-just for illustration, and in the real world you can accomplish the same thing
-using a [for
+play when we combine it with other package code. For the next chunk (see
+following page), we will use the `purrr` package to apply functions separately
+for each day in the `example_data` object, then combine the results. This is a
+concise approach, but might be tough to follow -- Don't worry too much about the
+specifics. This is just for illustration, and in the real world you can
+accomplish the same thing using a [for
 loop](https://www.datacamp.com/community/tutorials/tutorial-on-loops-in-r?utm_source=adwords_ppc&utm_medium=cpc&utm_campaignid=1658343521&utm_adgroupid=63833879975&utm_device=c&utm_keyword=for%20loop%20r&utm_matchtype=p&utm_network=g&utm_adpostion=&utm_creative=469789579350&utm_targetid=aud-517318241987:kwd-300177784001&utm_loc_interest_ms=&utm_loc_physical_ms=9023228&gclid=Cj0KCQiAjJOQBhCkARIsAEKMtO0WwT-kkNOrl9igPUceKrAjKurpqvUs4oTNFE56Lg5NuPwiBly1w-MaAqoyEALw_wcB)
 or any other approach you're comfortable with. (Be aware of some [looping
 limitations and
 alternatives](https://www.r-bloggers.com/2016/01/strategies-to-speedup-r-code/),
 though. In R, I prefer to use loops for saving an output data file in each
 iteration, rather than appending the iteration's result to an existing object.)
+
+\newpage
 
 ```{r demo, cache=FALSE}
 
@@ -358,6 +373,8 @@ d <- merge(d, mvpa_bouts)
 
 ```
 
+\newpage
+
 Now that we have our combined weartime/SB/MVPA dataset (the object called `d`),
 we can use the `adjust_bout_summaries` function to calculate residualized
 variables suitable for modeling.
@@ -368,7 +385,6 @@ variables suitable for modeling.
 adjust_bout_summaries(d, verbose = FALSE)
 
 ```
-\newpage
 
 The preceding code added several variables:
 
