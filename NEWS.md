@@ -1,3 +1,8 @@
+# PBpatterns 0.3.0
+
+* Added "Ostendorf_MVPA" method for `analyze_bouts`
+
+
 # PBpatterns 0.2.4
 
 * Filled in missing DESCRIPTION fields
