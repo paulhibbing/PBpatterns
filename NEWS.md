@@ -1,3 +1,8 @@
+# PBpatterns 0.3.1
+
+* Tweaked vignettes
+
+
 # PBpatterns 0.3.0
 
 * Added "Ostendorf_MVPA" method for `analyze_bouts`

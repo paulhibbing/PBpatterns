@@ -1,5 +1,5 @@
 ---
-title: "Clustered Recognition of Intermittent Bouts (CRIB)"
+title: "Clustered Recognition of Interrupted Bouts (CRIB)"
 author: "Paul R. Hibbing"
 output: rmarkdown::pdf_document
 urlcolor: blue
@@ -25,7 +25,7 @@ how:
 
 ```{r install, eval=FALSE}
 
-## remotes is a package that makes it easy to install packages from GitHub, but
+## `remotes` is a package that makes it easy to install packages from GitHub, but
 ## in my experience it sometimes struggles to install the related packages (i.e.,
 ## dependencies) correctly. So first we'll do a manual workaround. All it's
 ## doing is looking through a list of required packages, and installing any of
@@ -87,9 +87,9 @@ it into `analyze_bouts`. Let's see the code first, then go over what it means.
 
 mvpa_bouts <- PBpatterns::analyze_bouts(
   x = intensity,
-  method = "CRIB",
   target = "MVPA",
-  target_buffer_mins = 30,
+  method = "CRIB",
+  target_buffer_mins = 10,
   longest_allowable_interruption_mins = 2,
   required_percent = 80,
   max_n_interruptions = Inf,
@@ -107,16 +107,16 @@ Here is what each piece means:
   in your console, R will print the source code.
 * **x = intensity** Here we specify that our input datastream is `intensity`,
   as defined in the earlier code.
-* **method = "CRIB"** Here we specify that R should run the CRIB method. To
-  explore the other options, check out the [Bout Analysis and Sedentary Patterns
-  vignette](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/Bouts_and_Patterns.pdf).
 * **target = "MVPA"** Here we specify which behavior we are interested in.
   The input data (`intensity`) has values in the set `{SB, LPA, MVPA}`, and
   we would like to look specifically at bouts of `MVPA`, with the other
   behaviors being lumped together in a single group called `other`.
-* **target_buffer_mins = 30** Here we specify how our data should be
+* **method = "CRIB"** Here we specify that R should run the CRIB method. To
+  explore the other options, check out the [Bout Analysis and Sedentary Patterns
+  vignette](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/Bouts_and_Patterns.pdf).
+* **target_buffer_mins = 10** Here we specify how our data should be
   stratified/partitioned. In this case, `intensity` will be
-  stratified/partitioned anytime we see $\geq30$ consecutive minutes of `other`
+  stratified/partitioned anytime we see $\geq10$ consecutive minutes of `other`
   behavior.
 * **longest_allowable_interruption_mins = 2** Here we specify that a valid bout
   should not include any single interruption lasting longer than 2 minutes.
@@ -127,6 +127,7 @@ Here is what each piece means:
   `longest_allowable_interruption_mins` and `required_percent` are met.
 * **minimum_bout_duration_minutes = 10** Here we specify that only bouts lasting
   $\geq10$ min should be included in the output.
+* **epoch_length_sec = 60** Here we specify what the epoch length of `intensity` is.
   
 \newpage
   
@@ -149,9 +150,9 @@ mvpa_bouts
 
 This is a data frame with one row per bout. The variables are:
 
-* **start_index** The starting point of the bout (e.g., `intensity[1022]` for
+* **start_index** The starting point of the bout (e.g., `intensity[912]` for
   the first bout in this example)
-* **end_index** The ending point of the bout (e.g., `intensity[1039]` for
+* **end_index** The ending point of the bout (e.g., `intensity[932]` for
   the first bout in this example)
 * **values** A meaningless constant (equal to the setting of `target`),
   left over from run length encoding

@@ -27,5 +27,5 @@ remotes::install_github("paulhibbing/PBpatterns")
 For demonstrations of the main functions in `PBpatterns`, please see:
 
 * [Bout Analysis and Sedentary Patterns](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/Bouts_and_Patterns.pdf)
-* [Clustered Recognition of Intermittent Bouts (CRIB)](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/CRIB.pdf)
+* [Clustered Recognition of Interrupted Bouts (CRIB)](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/CRIB.pdf)
 * [Sedentary Profiles](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/SBprofiles.pdf)

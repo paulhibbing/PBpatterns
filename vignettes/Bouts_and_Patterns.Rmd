@@ -27,7 +27,7 @@ how:
 
 ```{r install, eval=FALSE}
 
-## remotes is a package that makes it easy to install packages from GitHub, but
+## `remotes` is a package that makes it easy to install packages from GitHub, but
 ## in my experience it sometimes struggles to install the related packages (i.e.,
 ## dependencies) correctly. So first we'll do a manual workaround. All it's
 ## doing is looking through a list of required packages, and installing any of
@@ -66,6 +66,8 @@ data(example_data, package = "PBpatterns")
 if (!"PhysicalActivity" %in% installed.packages()) install.packages(
   "PhysicalActivity"
 )
+
+
 
 ## Add a timestamp variable to satisfy `PhysicalActivity` requirements
 example_data$TimeStamp <- seq(
