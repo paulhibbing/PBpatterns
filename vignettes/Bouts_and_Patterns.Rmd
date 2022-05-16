@@ -166,7 +166,7 @@ The first couple of arguments are pretty straightforward:
 * **target** is the level of `x` for which you want the bout information.
 
 The `method` argument is ever so slighltly more involved. As you can see, there
-are currently five available methods:
+are currently six available methods:
 
 * **rle_standard** This is the traditional method based on run-length encoding.
 It simply returns information (start index, end index, and duration) about every
@@ -184,7 +184,7 @@ vignette](https://github.com/paulhibbing/PBpatterns/blob/main/vignettes/SBprofil
 * **MVPA_summary** This method is similar to `SB_summary`, but simpler and
 focused on MVPA instead of SB.
 
-The first three methods return a data frame with one row per bout. The
+The first four methods return a data frame with one row per bout. The
 `*_summary` methods return a one-row data frame that summarizes all of the
 bouts.
 
