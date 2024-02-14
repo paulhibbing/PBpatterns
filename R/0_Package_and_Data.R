@@ -1,7 +1,7 @@
 if(getRversion() >= "2.15.1") utils::globalVariables(c(
-  ".", "x", "y", "end_index", "fragmentation_index", "Freq", "n_days",
-  "n_SB_bouts", "total_MVPA_min", "total_SB_min", "total_weartime_min",
-  "valid_index", "counts", "id", "values", "valid_indices", "wear", "sb",
+  ".", "x", "y", "end_index", "epoch", "fragmentation_index", "Freq", "n_days",
+  "n_SB_bouts", "timestamp", "total_MVPA_min", "total_SB_min", "total_weartime_min",
+  "valid_index", "counts", "id", "values", "valid_indices", "value", "wear", "sb",
   "length_value", "length_total", "bouts"
 ))
 
