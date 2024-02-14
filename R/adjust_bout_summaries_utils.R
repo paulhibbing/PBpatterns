@@ -1,6 +1,6 @@
 res_missing <- function(look_for, calculate_from, d) {
   !exists(look_for, d) &
-  exists(calculate_from, d)
+  all(sapply(calculate_from, exists, d, USE.NAMES = FALSE))
 }
 
 residual_prepare <- function(d, verbose = FALSE) {

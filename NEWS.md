@@ -1,3 +1,10 @@
+# [PBpatterns 0.4.0 (in development)]
+
+* Added a regularity index framework
+* Fixed some broken examples (wonder if `exists` has changed with R updates,
+as it was no longer accepting a first argument with length > 1)
+
+
 # [PBpatterns 0.3.1](https://github.com/paulhibbing/PBpatterns/releases/tag/v0.3.1)
 
 * Tweaked vignettes
